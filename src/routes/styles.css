@@ -1,6 +1,6 @@
 body {
-  background-color: var(--light-background);
-  color: var(--light-text);
+  background-color: var(--canvas);
+  color: var(--text-primary);
   overflow-x: hidden;
   max-width: 1400px;
   margin: 0 auto;
