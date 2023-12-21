@@ -6,10 +6,10 @@ body {
   margin: 0 auto;
 }
 
+/* CARDS -------------------------------------- */
 .card {
   background-color: white;
   border-radius: 12px;
-  padding: 14px 20px;
 }
 
 .card.left {  
@@ -27,5 +27,44 @@ body {
   }
   .card.right {
     width: 60%;
+  }
+}
+
+/* BUTTONS -------------------------------------- */
+a.button,
+button {
+  background: var(--dark-purple);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  padding: 12px 24px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: bolder;
+}
+
+a.button.button-outlined,
+button.button-outlined {
+  background: transparent;
+  border: 1px solid var(--dark-purple);
+  color: var(--dark-purple);
+  padding: 10px 22px;
+  &:hover {
+    background: var(--light-purple);
+  }
+}
+
+a.button.button-light,
+button.button-light {
+  background: transparent;
+  color: var(--text-secondary);
+  &:hover {
+    background: var(--hover-gray);
+  }
+  &.active {
+    background: var(--light-purple);
+    color: var(--dark-purple);
   }
 }

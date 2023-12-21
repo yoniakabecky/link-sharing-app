@@ -13,7 +13,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 36px;
+  height: 64px;
+  padding: 14px 20px;
 }
 
 .header ul {
