@@ -1,0 +1,33 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.heading {
+  margin: 1.25rem 0;
+  padding: 20px 32px 0;
+}
+
+.description {
+  margin-top: 0;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  padding: 0 32px;
+}
+
+.children {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0 32px;
+}
+
+.action {
+  position: sticky;
+  bottom: -20px;
+  background: var(--card);
+  height: 80px;
+  border-top: 1px solid var(--border-gray);
+  padding: 20px 32px;
+  text-align: right;
+}

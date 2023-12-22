@@ -1,0 +1,9 @@
+.description {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.add {
+  margin: 1.25rem auto;
+  width: 100%;
+}

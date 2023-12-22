@@ -15,6 +15,7 @@
   --qwik-dark-background: #151934;
   --qwik-dark-text: #ffffff;
   --canvas: #FAFAFA;
+  --card: #FFFFFF;
   --text-primary: #333333;
   --text-secondary: #757575;
   --text-inverted: #FFFFFF;
@@ -22,6 +23,7 @@
   --light-purple: #EFECFD;
   --hover-gray: #F5F5F5;
   --skeleton-gray: #EEEEEE;
+  --border-gray: #DFDFDF;
 }
 
 html {
