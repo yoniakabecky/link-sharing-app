@@ -56,7 +56,7 @@ button {
 
 a.button.button-outlined,
 button.button-outlined {
-  background: transparent;
+  background: inherit;
   border: 1px solid var(--dark-purple);
   color: var(--dark-purple);
   padding: 10px 22px;
@@ -76,4 +76,49 @@ button.button-light {
     background: var(--light-purple);
     color: var(--dark-purple);
   }
+}
+
+/* FORMS -------------------------------------- */
+label {
+  margin-bottom: 6px;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+input,
+textarea {
+  background: var(--card);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  padding: 10px 14px;
+  height: 40px;
+  width: 100%;
+  &:focus {
+    outline: none;
+    border-color: var(--dark-purple);
+    box-shadow: 0px 0px 10px 2px rgba(93, 61, 245, 0.25);
+  }
+}
+
+select {
+  /* -moz-appearance: none; 
+  -webkit-appearance: none; 
+  appearance: none; */
+  margin-bottom: 0.85rem; 
+  background: var(--card);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  padding: 10px 14px;
+  height: 40px;
+  width: 100%;
+  &:focus {
+    outline: none;
+    border-color: var(--dark-purple);
+    box-shadow: 0px 0px 10px 2px rgba(93, 61, 245, 0.25);
+  }
+
 }

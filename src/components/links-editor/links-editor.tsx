@@ -1,6 +1,7 @@
 import { component$ } from "@builder.io/qwik";
 
 import FormWrapper from "~/components/form-wrapper/form-wrapper";
+import LinkItem from "~/components/link-item/link-item";
 import styles from "./links-editor.module.css";
 
 export default component$(() => {
@@ -11,18 +12,14 @@ export default component$(() => {
         Add/edit/remove links below and then share all profiles with the world!
       </span>
 
-      <button class={["button button-outlined", styles.add]}>
-        + Add new link
-      </button>
+      <div class={styles.scrollArea}>
+        <button class={["button button-outlined", styles.addButton]}>
+          + Add new link
+        </button>
 
-      <div>
-        <div>Link #1</div>
-        <div>remove</div>
-        <label for="platform">Platform</label>
-        <input id="platform" type="text" />
-
-        <label for="link">Link</label>
-        <input id="link" type="text" />
+        <LinkItem index={1} />
+        <LinkItem index={2} />
+        <LinkItem index={3} />
       </div>
     </FormWrapper>
   );
