@@ -13,6 +13,13 @@ main {
 }
 
 /* CARDS -------------------------------------- */
+.editor { 
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  height: 100%;
+}  
+
 .card {
   background-color: white;
   border-radius: 12px;
@@ -29,7 +36,13 @@ main {
   height: 100%;
   width: 100%;
 }
-
+  
+@media (min-width: 640px) {
+  .editor {
+    padding: 0 20px 20px;
+  }
+}
+  
 @media (min-width: 1024px) {
   .card.left {
     display: block;

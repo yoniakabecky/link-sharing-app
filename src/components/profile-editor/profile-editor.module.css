@@ -1,0 +1,67 @@
+.pictureWrapper {
+  display: grid;
+  grid-template-columns: 200px 164px auto;
+  align-items: center;
+  gap: 20px;
+  margin: 1.25rem auto;
+  background-color: var(--canvas);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--text-secondary);
+  overflow: hidden;
+}
+
+.pictureWrapper p {
+  font-size: 14px;
+}
+
+.pictureWrapper small {
+  display: inline-block;
+  font-size: 10px;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 164px;
+  height: 164px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.imageWrapper .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.2s ease-in-out;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+  color: var(--text-inverted);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+
+.form {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 20px;
+  background-color: var(--canvas);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.form p {
+  margin: 0;
+  align-self: center;
+  width: 200px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
