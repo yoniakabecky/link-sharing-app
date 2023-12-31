@@ -17,23 +17,41 @@ export const MenuItem = component$<LinkProps>(({ href }) => {
 });
 
 export default component$(() => {
+  const location = useLocation();
+  const isPreview = location.url.pathname === "/preview/";
+
   return (
     <header class={styles.header}>
       <div class={styles.outer}>
-        <div class={["card", styles.inner]}>
-          <div class={styles.logo}>
-            <a href="/">logo</a>
+        {isPreview ? (
+          <div class={["card", styles.inner]}>
+            <div>
+              <Link href="/links/" class="button button-outlined">
+                Back to Editor
+              </Link>
+            </div>
+            <div>
+              <Link href="/" class="button">
+                Share Link
+              </Link>
+            </div>
           </div>
-          <ul>
-            <MenuItem href="/links/">Links</MenuItem>
-            <MenuItem href="/profile/">Profile Details</MenuItem>
-          </ul>
-          <div>
-            <Link href="/preview" class="button button-outlined">
-              Preview
-            </Link>
+        ) : (
+          <div class={["card", styles.inner]}>
+            <div class={styles.logo}>
+              <a href="/">logo</a>
+            </div>
+            <ul>
+              <MenuItem href="/links/">Links</MenuItem>
+              <MenuItem href="/profile/">Profile Details</MenuItem>
+            </ul>
+            <div>
+              <Link href="/preview/" class="button button-outlined">
+                Preview
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );
