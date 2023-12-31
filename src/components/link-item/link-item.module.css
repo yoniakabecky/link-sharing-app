@@ -10,10 +10,20 @@
 }
 
 .title {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
   font-size: 0.875rem;
   font-weight: bold;
   margin-bottom: 14px;
   color: var(--text-secondary);
+
+  & > svg {
+    cursor: grab;
+  }
+  & > svg:active {
+    cursor: grabbing;
+  }
 }
 
 .remove {

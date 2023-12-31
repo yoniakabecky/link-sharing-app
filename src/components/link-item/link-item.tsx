@@ -1,12 +1,14 @@
 import { component$ } from "@builder.io/qwik";
 
+import { Icon } from "~/components/icon/icon";
 import styles from "./link-item.module.css";
 
 export default component$(({ index }: { index: number }) => {
   return (
     <div class={styles.root}>
       <div class={styles.title}>
-        <span></span>Link #{index}
+        <Icon name="drag_handle" size={18} />
+        Link #{index}
       </div>
       <div class={styles.remove}>Remove</div>
 

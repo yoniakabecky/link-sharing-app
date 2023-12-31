@@ -1,5 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import FormWrapper from "~/components/form-wrapper/form-wrapper";
+import { Icon } from "~/components/icon/icon";
 import styles from "./profile-editor.module.css";
 
 export default component$(() => {
@@ -14,7 +15,7 @@ export default component$(() => {
         <p>Profile Picture</p>
         <div class={styles.imageWrapper}>
           <div class={styles.overlay}>
-            <div>icon</div>
+            <Icon name="pic_line" size={32} />
             <div>Change Image</div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { Slot, component$ } from "@builder.io/qwik";
 import type { LinkProps } from "@builder.io/qwik-city";
 import { Link, useLocation } from "@builder.io/qwik-city";
+import { Icon } from "~/components/icon/icon";
 import styles from "./header.module.css";
 
 export const MenuItem = component$<LinkProps>(({ href }) => {
@@ -42,8 +43,14 @@ export default component$(() => {
               <a href="/">logo</a>
             </div>
             <ul>
-              <MenuItem href="/links/">Links</MenuItem>
-              <MenuItem href="/profile/">Profile Details</MenuItem>
+              <MenuItem href="/links/">
+                <Icon name="link" size={16} />
+                Links
+              </MenuItem>
+              <MenuItem href="/profile/">
+                <Icon name="user" size={16} />
+                Profile Details
+              </MenuItem>
             </ul>
             <div>
               <Link href="/preview/" class="button button-outlined">
