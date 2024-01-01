@@ -1,0 +1,28 @@
+label {
+  margin-bottom: 6px;
+  font-size: 10px;
+  color: var(--text-secondary);
+}
+
+input {
+  background: var(--card);
+  border: 1px solid var(--border-gray);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  padding: 10px 14px;
+  height: 40px;
+  width: 100%;
+  &:focus {
+    outline: none;
+    border-color: var(--dark-purple);
+    box-shadow: 0px 0px 10px 2px rgba(93, 61, 245, 0.25);
+  }
+}
+
+.error-message {
+  color: tomato;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding-top: 0.25rem;
+}
