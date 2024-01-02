@@ -6,7 +6,7 @@ import styles from "./links-editor.module.css";
 
 export default component$(() => {
   return (
-    <FormWrapper>
+    <FormWrapper formName="linksForm">
       <div q:slot="heading">Customize your links</div>
       <span q:slot="description">
         Add/edit/remove links below and then share all profiles with the world!

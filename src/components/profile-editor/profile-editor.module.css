@@ -49,7 +49,6 @@
   }
 }
 
-
 .form {
   display: grid;
   grid-template-columns: 200px 1fr;
@@ -59,10 +58,8 @@
   padding: 16px;
 }
 
-.form p {
-  margin: 0;
-  align-self: center;
-  width: 200px;
-  font-size: 14px;
+.form label {
+  padding-top: 0.75rem;
+  font-size: 0.875rem;
   color: var(--text-secondary);
 }

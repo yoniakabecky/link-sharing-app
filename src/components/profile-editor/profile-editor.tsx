@@ -1,11 +1,30 @@
-import { component$ } from "@builder.io/qwik";
+import { $, type QRL, component$ } from "@builder.io/qwik";
+import { type SubmitHandler, useForm, valiForm$ } from "@modular-forms/qwik";
 import FormWrapper from "~/components/form-wrapper/form-wrapper";
 import { Icon } from "~/components/icon/icon";
+import {
+  type ProfileForm,
+  useProfileFormLoader,
+  ProfileFormSchema,
+  useProfileFormAction,
+} from "~/routes/profile";
+import { TextField } from "../textfield/textfield";
 import styles from "./profile-editor.module.css";
 
 export default component$(() => {
+  const [, { Form, Field }] = useForm<ProfileForm>({
+    loader: useProfileFormLoader(),
+    action: useProfileFormAction(),
+    validate: valiForm$(ProfileFormSchema),
+  });
+
+  const handleSubmit: QRL<SubmitHandler<ProfileForm>> = $((values, event) => {
+    // Runs on client
+    console.log(values, event);
+  });
+
   return (
-    <FormWrapper>
+    <FormWrapper formName="ProfileForm">
       <div q:slot="heading">Profile Details</div>
       <span q:slot="description">
         Add your details to create a personal touch to your profile.
@@ -25,14 +44,49 @@ export default component$(() => {
         </div>
       </div>
 
-      <form class={styles.form}>
-        <p aria-label="first-name">First name*</p>
-        <input id="first-name" />
-        <p aria-label="last-name">Last name*</p>
-        <input id="last-name" />
-        <p aria-label="email">Email</p>
-        <input id="email" type="email" />
-      </form>
+      <Form id="ProfileForm" onSubmit$={handleSubmit} class={styles.form}>
+        <label for="firstName" class="text-md">
+          First name*
+        </label>
+        <Field name="firstName">
+          {(field, props) => (
+            <TextField
+              {...props}
+              required
+              name="firstName"
+              error={field.error}
+            />
+          )}
+        </Field>
+
+        <label for="lastName" class="text-md">
+          Last name*
+        </label>
+        <Field name="lastName">
+          {(field, props) => (
+            <TextField
+              {...props}
+              required
+              name="lastName"
+              error={field.error}
+            />
+          )}
+        </Field>
+
+        <label for="email" class="text-md">
+          Email
+        </label>
+        <Field name="email">
+          {(field, props) => (
+            <TextField
+              {...props}
+              name="email"
+              type="email"
+              error={field.error}
+            />
+          )}
+        </Field>
+      </Form>
     </FormWrapper>
   );
 });
