@@ -1,15 +1,16 @@
-import { $, component$ } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import { insert, remove, useForm, valiForm$ } from "@modular-forms/qwik";
 
 import FormWrapper from "~/components/form-wrapper/form-wrapper";
 import { Icon } from "~/components/icon/icon";
+import { Select } from "~/components/select/select";
+import { TextField } from "~/components/textfield/textfield";
 import {
   type LinksForm,
   LinksFormSchema,
   useLinksFormAction,
   useLinksFormLoader,
 } from "~/routes/links";
-import { TextField } from "../textfield/textfield";
 import styles from "./links-editor.module.css";
 
 export default component$(() => {
@@ -50,9 +51,7 @@ export default component$(() => {
                   </div>
                   <div
                     class={styles.removeButton}
-                    onClick$={$(() =>
-                      remove(linksForm, "links", { at: index })
-                    )}
+                    onClick$={() => remove(linksForm, "links", { at: index })}
                   >
                     Remove
                   </div>
@@ -60,19 +59,21 @@ export default component$(() => {
                   <Field name={`links.${index}.platform`}>
                     {(field, props) => (
                       <>
-                        <label for={`platform${index}`}>Platform</label>
-                        <select
+                        <Select
                           {...props}
-                          id={`platform${index}`}
+                          label="Platform"
+                          name={`platform${index}`}
                           value={field.value}
-                        >
-                          <option value="github">GitHub</option>
-                          <option value="youtube">YouTube</option>
-                          <option value="linkedin">Linkedin</option>
-                          <option value="x">X (Twitter)</option>
-                          <option value="portfolio">Portfolio</option>
-                          <option value="custom">Custom</option>
-                        </select>
+                          error={field.error}
+                          options={[
+                            { label: "GitHub", value: "github" },
+                            { label: "YouTube", value: "youtube" },
+                            { label: "Linkedin", value: "linkedin" },
+                            { label: "X (Twitter)", value: "x" },
+                            { label: "Portfolio", value: "portfolio" },
+                            { label: "Custom", value: "custom" },
+                          ]}
+                        />
                       </>
                     )}
                   </Field>

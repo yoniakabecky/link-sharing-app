@@ -14,7 +14,7 @@ import MockView from "~/components/mock-view/mock-view";
 export const LinksFormSchema = v.object({
   links: v.array(
     v.object({
-      platform: v.string([v.minLength(1, "Please enter a platform.")]),
+      platform: v.string([v.minLength(1, "Please select a platform.")]),
       link: v.string([v.minLength(1, "Please enter a link.")]),
     })
   ),

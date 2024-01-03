@@ -1,8 +1,10 @@
 import type { QwikIntrinsicElements } from "@builder.io/qwik";
 import { icons } from "./icons";
 
+export type IconName = keyof typeof icons;
+
 type IconProps = {
-  name: keyof typeof icons;
+  name: IconName;
   key?: string;
   size?: number;
 } & QwikIntrinsicElements["svg"];

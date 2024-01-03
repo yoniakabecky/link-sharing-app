@@ -93,24 +93,3 @@ button.button-light {
     color: var(--dark-purple);
   }
 }
-
-/* FORMS -------------------------------------- */
-select {
-  /* -moz-appearance: none; 
-  -webkit-appearance: none; 
-  appearance: none; */
-  margin-bottom: 0.85rem; 
-  background: var(--card);
-  border: 1px solid var(--border-gray);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  padding: 10px 14px;
-  height: 40px;
-  width: 100%;
-  &:focus {
-    outline: none;
-    border-color: var(--dark-purple);
-    box-shadow: 0px 0px 10px 2px rgba(93, 61, 245, 0.25);
-  }
-}
