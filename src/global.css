@@ -25,6 +25,7 @@
   --hover-gray: #F5F5F5;
   --skeleton-gray: #EEEEEE;
   --border-gray: #DFDFDF;
+  --error-red: #FF6347;
 }
 
 html {
