@@ -1,0 +1,16 @@
+{
+  "links": {
+    "links" : [
+      { "platform": "github", "link": "https://github.com/" },
+      { "platform": "linkedin", "link": "https://www.linkedin.com/" }
+    ]
+  },
+  "profile": {
+    "firstName": "Jane",
+    "lastName": "Doe",
+    "email": "jane.doe@email.com"
+  },
+  "avatar": {
+    "url": "https://picsum.photos/id/40/200/200"
+  }
+}

@@ -54,6 +54,7 @@ export default component$(() => {
               {...props}
               required
               name="firstName"
+              value={field.value}
               error={field.error}
             />
           )}
@@ -68,6 +69,7 @@ export default component$(() => {
               {...props}
               required
               name="lastName"
+              value={field.value}
               error={field.error}
             />
           )}
@@ -82,6 +84,7 @@ export default component$(() => {
               {...props}
               name="email"
               type="email"
+              value={field.value ?? ""}
               error={field.error}
             />
           )}

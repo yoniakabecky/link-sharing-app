@@ -22,20 +22,13 @@ export const LinksFormSchema = v.object({
 
 export type LinksForm = Input<typeof LinksFormSchema>;
 
-export const useLinksFormLoader = routeLoader$<InitialValues<LinksForm>>(() => {
-  return {
-    links: [
-      {
-        platform: "github",
-        link: "https://github.com/yoniakabecky",
-      },
-      {
-        platform: "",
-        link: "",
-      },
-    ],
-  };
-});
+export const useLinksFormLoader = routeLoader$<InitialValues<LinksForm>>(
+  async () => {
+    const res = await fetch("http://localhost:3000/links");
+    const links = (await res.json()) as LinksForm;
+    return links;
+  }
+);
 
 export const useLinksFormAction = formAction$<LinksForm>((values) => {
   // Runs on server

@@ -23,12 +23,10 @@ export const ProfileFormSchema = v.object({
 export type ProfileForm = Input<typeof ProfileFormSchema>;
 
 export const useProfileFormLoader = routeLoader$<InitialValues<ProfileForm>>(
-  () => {
-    return {
-      firstName: "",
-      lastName: "",
-      email: "",
-    };
+  async () => {
+    const res = await fetch("http://localhost:3000/profile");
+    const profile = (await res.json()) as ProfileForm;
+    return profile;
   }
 );
 
