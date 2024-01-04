@@ -5,6 +5,11 @@ import type { RequestHandler } from "@builder.io/qwik-city";
 import Header from "~/components/header/header";
 import styles from "./styles.css?inline";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { useLinksFormLoader, useProfileFormLoader } from "./loaders";
+// need to re-export for the loader to work
+export { useLinksFormLoader, useProfileFormLoader } from "./loaders";
+
 export const onGet: RequestHandler = async ({ cacheControl }) => {
   // Control caching for this request for best performance and to reduce hosting costs:
   // https://qwik.builder.io/docs/caching/
