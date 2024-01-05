@@ -2,6 +2,7 @@
   "links": {
     "links" : [
       { "platform": "github", "link": "https://github.com/" },
+      { "platform": "youtube", "link": "https://www.youtube.com/" },
       { "platform": "linkedin", "link": "https://www.linkedin.com/" }
     ]
   },

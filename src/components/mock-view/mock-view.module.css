@@ -41,6 +41,7 @@
 
 .name {
   margin-top: 20px;
+  font-weight: 700;
   &.skeleton {
     width: 136px;
     height: 16px;
@@ -50,9 +51,12 @@
 }
 
 .email {
-  margin-top: 8px;
-  height: 8px;
+  margin-top: 10px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
   &.skeleton {
+    margin-top: 8px;
+    height: 8px;
     width: 60px;
     border-radius: 4px;
     background: var(--skeleton-gray);
@@ -67,10 +71,14 @@
 }
 
 .link {
+  display: flex;
+  align-items: center;
   margin-bottom: 16px;
   width: 200px;
   height: 38px;
   border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 0.625rem;
   &.skeleton {
     background: var(--skeleton-gray);
   }
