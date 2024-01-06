@@ -2,15 +2,15 @@ import { component$ } from "@builder.io/qwik";
 import { useLocation } from "@builder.io/qwik-city";
 import MobileMock from "~/media/mobile-mock.svg?jsx";
 import type { PlatformType } from "~/models/platform";
-import { useLinksFormLoader, useProfileFormLoader } from "~/routes/layout";
+import { useLinksLoader, useProfileLoader } from "~/routes/layout";
 import LinkButton from "../link-button/link-button";
 import styles from "./mock-view.module.css";
 
 const MIN_LINKS = 5;
 
 export default component$(() => {
-  const profile = useProfileFormLoader();
-  const links = useLinksFormLoader();
+  const profile = useProfileLoader();
+  const links = useLinksLoader();
   const location = useLocation();
   const isLinksPage = location.url.pathname === "/links/";
 

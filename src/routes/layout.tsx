@@ -7,15 +7,15 @@ import styles from "./styles.css?inline";
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
-  useLinksFormLoader,
-  useProfileFormLoader,
+  useLinksLoader,
+  useProfileLoader,
   useProfileFormAction,
   useLinksFormAction,
 } from "./loaders";
 // need to re-export for the loader to work
 export {
-  useLinksFormLoader,
-  useProfileFormLoader,
+  useLinksLoader,
+  useProfileLoader,
   useProfileFormAction,
   useLinksFormAction,
 } from "./loaders";

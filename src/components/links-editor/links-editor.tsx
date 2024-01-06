@@ -5,13 +5,13 @@ import FormWrapper from "~/components/form-wrapper/form-wrapper";
 import { Icon } from "~/components/icon/icon";
 import { Select } from "~/components/select/select";
 import { TextField } from "~/components/textfield/textfield";
-import { useLinksFormAction, useLinksFormLoader } from "~/routes/layout";
+import { useLinksFormAction, useLinksLoader } from "~/routes/layout";
 import { type LinksForm, LinksFormSchema } from "~/routes/schema";
 import styles from "./links-editor.module.css";
 
 export default component$(() => {
   const [linksForm, { Form, Field, FieldArray }] = useForm<LinksForm>({
-    loader: useLinksFormLoader(),
+    loader: useLinksLoader(),
     action: useLinksFormAction(),
     validate: valiForm$(LinksFormSchema),
     fieldArrays: ["links"],

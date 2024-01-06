@@ -10,7 +10,7 @@ import {
 import type { LinksForm, ProfileForm } from "./schema";
 import { ProfileFormSchema, LinksFormSchema } from "./schema";
 
-export const useProfileFormLoader = routeLoader$<InitialValues<ProfileForm>>(
+export const useProfileLoader = routeLoader$<InitialValues<ProfileForm>>(
   async () => {
     const res = await fetch("http://localhost:3000/profile");
     const profile = (await res.json()) as ProfileForm;
@@ -39,7 +39,7 @@ export const useProfileFormAction = formAction$<ProfileForm, any>(
   valiForm$(ProfileFormSchema)
 );
 
-export const useLinksFormLoader = routeLoader$<InitialValues<LinksForm>>(
+export const useLinksLoader = routeLoader$<InitialValues<LinksForm>>(
   async () => {
     const res = await fetch("http://localhost:3000/links");
     const links = (await res.json()) as LinksForm;
