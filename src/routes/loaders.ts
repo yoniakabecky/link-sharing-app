@@ -5,6 +5,7 @@ import {
   formAction$,
   valiForm$,
   type InitialValues,
+  FormError,
 } from "@modular-forms/qwik";
 import type { LinksForm, ProfileForm } from "./schema";
 import { ProfileFormSchema, LinksFormSchema } from "./schema";
@@ -17,10 +18,26 @@ export const useProfileFormLoader = routeLoader$<InitialValues<ProfileForm>>(
   }
 );
 
-export const useProfileFormAction = formAction$<ProfileForm>((values) => {
-  // Runs on server
-  console.log({ values });
-}, valiForm$(ProfileFormSchema));
+export const useProfileFormAction = formAction$<ProfileForm, any>(
+  async (values) => {
+    const response = await fetch("http://localhost:3000/profile/", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...values }),
+    });
+    if (response.ok) {
+      const data = await response.json();
+      return {
+        status: "success",
+        message: "Your changes have been successfully saved!",
+        data,
+      };
+    } else {
+      throw new FormError<ProfileForm>("Failed to save");
+    }
+  },
+  valiForm$(ProfileFormSchema)
+);
 
 export const useLinksFormLoader = routeLoader$<InitialValues<LinksForm>>(
   async () => {
@@ -30,7 +47,20 @@ export const useLinksFormLoader = routeLoader$<InitialValues<LinksForm>>(
   }
 );
 
-export const useLinksFormAction = formAction$<LinksForm>((values) => {
-  // Runs on server
-  console.log({ values });
+export const useLinksFormAction = formAction$<LinksForm>(async (values) => {
+  const response = await fetch("http://localhost:3000/links/", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...values }),
+  });
+  if (response.ok) {
+    const data = await response.json();
+    return {
+      status: "success",
+      message: "Your changes have been successfully saved!",
+      data,
+    };
+  } else {
+    throw new FormError<LinksForm>("Failed to save");
+  }
 }, valiForm$(LinksFormSchema));

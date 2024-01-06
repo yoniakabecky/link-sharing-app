@@ -2,7 +2,7 @@ import { $, type QRL, component$ } from "@builder.io/qwik";
 import { type SubmitHandler, useForm, valiForm$ } from "@modular-forms/qwik";
 import FormWrapper from "~/components/form-wrapper/form-wrapper";
 import { Icon } from "~/components/icon/icon";
-import { useProfileFormLoader } from "~/routes/layout";
+import { useProfileFormLoader, useProfileFormAction } from "~/routes/layout";
 import { type ProfileForm, ProfileFormSchema } from "~/routes/schema";
 import { TextField } from "../textfield/textfield";
 import styles from "./profile-editor.module.css";
@@ -10,7 +10,7 @@ import styles from "./profile-editor.module.css";
 export default component$(() => {
   const [, { Form, Field }] = useForm<ProfileForm>({
     loader: useProfileFormLoader(),
-    // action: useProfileFormAction(),
+    action: useProfileFormAction(),
     validate: valiForm$(ProfileFormSchema),
   });
 

@@ -4,10 +4,10 @@ import * as v from "valibot";
 export const ProfileFormSchema = v.object({
   firstName: v.string([v.minLength(1, "Please enter your first name.")]),
   lastName: v.string([v.minLength(1, "Please enter your last name.")]),
-  email: v.nullable(
+  email: v.nullish(
     v.string([v.email("The email address is badly formatted.")])
   ),
-  avatar: v.nullable(v.string([v.url("Please enter a valid URL.")])),
+  avatar: v.nullish(v.string([v.url("Please enter a valid URL.")])),
 });
 
 export type ProfileForm = Input<typeof ProfileFormSchema>;

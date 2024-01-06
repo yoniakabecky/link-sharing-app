@@ -21,7 +21,7 @@ export default component$(({ formName }: FormWrapperProps) => {
       </div>
 
       <div class={styles.action}>
-        <button class="save" form={formName}>
+        <button class="save" type="submit" form={formName}>
           Save
         </button>
       </div>
