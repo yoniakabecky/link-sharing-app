@@ -9,9 +9,7 @@
   "profile": {
     "firstName": "Jane",
     "lastName": "Doe",
-    "email": "jane.doe@email.com"
-  },
-  "avatar": {
-    "url": "https://picsum.photos/id/40/200/200"
+    "email": "jane.doe@email.com",
+    "avatar": "https://picsum.photos/id/40/200/200"
   }
 }

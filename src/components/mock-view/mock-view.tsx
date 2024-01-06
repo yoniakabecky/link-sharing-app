@@ -14,9 +14,9 @@ export default component$(() => {
   const location = useLocation();
   const isLinksPage = location.url.pathname === "/links/";
 
-  const { firstName, lastName, email } = profile.value;
+  const { firstName, lastName, email, avatar } = profile.value;
   const hasValue = (str: string | null | undefined) => str !== "" || !!str;
-
+  console.log(avatar);
   return (
     <div class={styles.root}>
       <div class={styles.imageWrapper}>
@@ -24,7 +24,13 @@ export default component$(() => {
       </div>
       <div class={styles.contents}>
         <div class={styles.profile}>
-          <div class={[styles.picture, styles.skeleton]}></div>
+          {avatar && hasValue(avatar) ? (
+            <div class={styles.picture}>
+              <img src={avatar as string} alt="avatar" width={80} height={80} />
+            </div>
+          ) : (
+            <div class={[styles.picture, styles.skeleton]} />
+          )}
           <div
             class={[
               styles.name,
@@ -37,6 +43,7 @@ export default component$(() => {
             {email}
           </div>
         </div>
+
         <div class={styles.links}>
           {links.value.links.map((item) => (
             <LinkButton

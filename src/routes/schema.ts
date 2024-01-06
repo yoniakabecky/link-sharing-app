@@ -7,6 +7,7 @@ export const ProfileFormSchema = v.object({
   email: v.nullable(
     v.string([v.email("The email address is badly formatted.")])
   ),
+  avatar: v.nullable(v.string([v.url("Please enter a valid URL.")])),
 });
 
 export type ProfileForm = Input<typeof ProfileFormSchema>;
