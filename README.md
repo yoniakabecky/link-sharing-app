@@ -1,4 +1,4 @@
-# Qwik City App ⚡️
+# Link Sharing App 🚀
 
 - [Qwik Docs](https://qwik.builder.io/)
 - [Discord](https://qwik.builder.io/chat)
