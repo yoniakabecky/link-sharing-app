@@ -6,18 +6,24 @@ import styles from "./link-button.css?inline";
 interface Props {
   type: PlatformType;
   link: string;
+  view?: "mock" | "preview";
 }
-export default component$(({ type, link }: Props) => {
-  useStylesScoped$(styles);
-  const { icon, label, color } = platforms[type];
 
-  return (
-    <div class="root" style={{ backgroundColor: color }}>
-      <a href={link} target="_blank">
-        <Icon name={icon} size={16} />
-        <span class="label">{label}</span>
-        <Icon name="arrow_right" size={16} class="arrow" />
-      </a>
-    </div>
-  );
-});
+export const LinkButton = component$(
+  ({ type, link, view = "preview" }: Props) => {
+    useStylesScoped$(styles);
+
+    const { icon, label, color } = platforms[type];
+    const iconSize = view === "mock" ? 16 : 20;
+
+    return (
+      <div class={["root", view]} style={{ backgroundColor: color }}>
+        <a href={link} target="_blank">
+          <Icon name={icon} size={iconSize} />
+          <span class="label">{label}</span>
+          <Icon name="arrow_right" size={16} class="arrow" />
+        </a>
+      </div>
+    );
+  }
+);

@@ -1,9 +1,10 @@
 import { component$ } from "@builder.io/qwik";
 import { useLocation } from "@builder.io/qwik-city";
+import { Avatar } from "~/components/avatar/avatar";
+import { LinkButton } from "~/components/link-button/link-button";
 import MobileMock from "~/media/mobile-mock.svg?jsx";
 import type { PlatformType } from "~/models/platform";
 import { useLinksLoader, useProfileLoader } from "~/routes/layout";
-import LinkButton from "../link-button/link-button";
 import styles from "./mock-view.module.css";
 
 const MIN_LINKS = 5;
@@ -24,13 +25,8 @@ export default component$(() => {
       </div>
       <div class={styles.contents}>
         <div class={styles.profile}>
-          {avatar && hasValue(avatar) ? (
-            <div class={styles.picture}>
-              <img src={avatar as string} alt="avatar" width={80} height={80} />
-            </div>
-          ) : (
-            <div class={[styles.picture, styles.skeleton]} />
-          )}
+          <Avatar src={avatar as string} view="mock" />
+
           <div
             class={[
               styles.name,
@@ -50,6 +46,7 @@ export default component$(() => {
               type={item.platform as PlatformType}
               link={item.link as string}
               key={item.link}
+              view="mock"
             />
           ))}
           {isLinksPage &&
