@@ -23,7 +23,7 @@
     "preview": "qwik build preview && vite preview --open",
     "start": "vite --open --mode ssr",
     "qwik": "qwik",
-    "json": "pnpm dlx json-server --watch ./data/db.json"
+    "json": "pnpm dlx json-server ./data/db.json"
   },
   "devDependencies": {
     "@builder.io/qwik": "^1.3.1",
