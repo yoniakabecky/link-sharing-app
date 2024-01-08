@@ -5,17 +5,22 @@ import { LinkButton } from "~/components/link-button/link-button";
 import MobileMock from "~/media/mobile-mock.svg?jsx";
 import type { PlatformType } from "~/models/platform";
 import { useLinksLoader, useProfileLoader } from "~/routes/layout";
+import type { ProfileForm } from "~/routes/schema";
 import styles from "./mock-view.module.css";
 
 const MIN_LINKS = 5;
 
-export default component$(() => {
+interface MockViewProps {
+  profile?: ProfileForm;
+}
+
+export default component$((props: MockViewProps) => {
   const profile = useProfileLoader();
   const links = useLinksLoader();
   const location = useLocation();
   const isLinksPage = location.url.pathname === "/links/";
 
-  const { firstName, lastName, email, avatar } = profile.value;
+  const { firstName, lastName, email, avatar } = props.profile ?? profile.value;
   const hasValue = (str: string | null | undefined) => str !== "" || !!str;
 
   return (

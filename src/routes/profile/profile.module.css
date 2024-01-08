@@ -49,7 +49,11 @@
   }
 }
 
-.form {
+.imageWrapper input {
+  display: none;
+}
+
+.inputWrapper {
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 20px;
@@ -58,7 +62,7 @@
   padding: 16px;
 }
 
-.form label {
+.inputWrapper label {
   padding-top: 0.75rem;
   font-size: 0.875rem;
   color: var(--text-secondary);
