@@ -4,7 +4,7 @@ import { Icon } from "../icon/icon";
 import styles from "./link-button.css?inline";
 
 interface Props {
-  type: PlatformType;
+  type: PlatformType | "";
   link: string;
   view?: "mock" | "preview";
 }
@@ -12,6 +12,8 @@ interface Props {
 export const LinkButton = component$(
   ({ type, link, view = "preview" }: Props) => {
     useStylesScoped$(styles);
+
+    if (type === "") return <div class="skeleton" />;
 
     const { icon, label, color } = platforms[type];
     const iconSize = view === "mock" ? 16 : 20;

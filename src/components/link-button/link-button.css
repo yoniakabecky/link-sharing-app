@@ -46,3 +46,18 @@ a:hover:after {
 .label {
   flex-grow: 1;
 }
+
+.skeleton {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  width: 200px;
+  height: 38px;
+  border-radius: 6px;
+  padding: 12px 14px;
+  font-size: 0.625rem;
+  background: var(--skeleton-gray);
+  &:last-child {
+    margin-bottom: 0px;
+  }
+}

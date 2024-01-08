@@ -94,9 +94,14 @@ export const platforms: Record<PlatformType, Platform> = {
   },
   custom: {
     type: "custom",
-    label: "",
+    label: "Custom",
     url: "",
     color: "#000000",
     icon: "web",
   },
 };
+
+export const platformOptions = Object.values(platforms).map((platform) => ({
+  value: platform.type,
+  label: platform.label,
+}));

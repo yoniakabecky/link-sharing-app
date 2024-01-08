@@ -1,27 +1,25 @@
 import { component$ } from "@builder.io/qwik";
-import { useLocation } from "@builder.io/qwik-city";
 import { Avatar } from "~/components/avatar/avatar";
 import { LinkButton } from "~/components/link-button/link-button";
 import MobileMock from "~/media/mobile-mock.svg?jsx";
 import type { PlatformType } from "~/models/platform";
 import { useLinksLoader, useProfileLoader } from "~/routes/layout";
-import type { ProfileForm } from "~/routes/schema";
+import type { LinkItem, ProfileForm } from "~/routes/schema";
 import styles from "./mock-view.module.css";
-
-const MIN_LINKS = 5;
 
 interface MockViewProps {
   profile?: ProfileForm;
+  links?: LinkItem[];
 }
 
 export default component$((props: MockViewProps) => {
   const profile = useProfileLoader();
   const links = useLinksLoader();
-  const location = useLocation();
-  const isLinksPage = location.url.pathname === "/links/";
 
   const { firstName, lastName, email, avatar } = props.profile ?? profile.value;
   const hasValue = (str: string | null | undefined) => str !== "" || !!str;
+
+  const linksArray = props.links ?? links.value.links;
 
   return (
     <div class={styles.root}>
@@ -46,7 +44,7 @@ export default component$((props: MockViewProps) => {
         </div>
 
         <div class={styles.links}>
-          {links.value.links.map((item) => (
+          {linksArray.map((item) => (
             <LinkButton
               type={item.platform as PlatformType}
               link={item.link as string}
@@ -54,11 +52,6 @@ export default component$((props: MockViewProps) => {
               view="mock"
             />
           ))}
-          {isLinksPage &&
-            links.value.links.length < MIN_LINKS &&
-            new Array(MIN_LINKS - links.value.links.length)
-              .fill(0)
-              .map((_, i) => <div class={styles.linkSkeleton} key={i} />)}
         </div>
       </div>
     </div>

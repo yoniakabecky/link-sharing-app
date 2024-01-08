@@ -22,3 +22,4 @@ export const LinksFormSchema = v.object({
 });
 
 export type LinksForm = Input<typeof LinksFormSchema>;
+export type LinkItem = LinksForm["links"][number];
