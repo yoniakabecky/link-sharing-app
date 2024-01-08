@@ -25,7 +25,7 @@
   align-items: center;
   margin: 0 auto;
   width: 18.5rem;
-  height: 30rem;
+  min-height: 30rem;
   padding: 40px;
   border-radius: 1.25rem;
   background-color: var(--card);

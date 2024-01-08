@@ -5,12 +5,12 @@
   overflow: hidden;
 }
 
-.root .mock {
+.root.mock {
   height: 38px;
   font-size: 10px;
 }
 
-.root .preview {
+.root.preview {
   height: 48px;
   font-size: 13px;
 }

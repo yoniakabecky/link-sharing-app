@@ -17,7 +17,7 @@ export default component$(() => {
 
   const { firstName, lastName, email, avatar } = profile.value;
   const hasValue = (str: string | null | undefined) => str !== "" || !!str;
-  console.log(avatar);
+
   return (
     <div class={styles.root}>
       <div class={styles.imageWrapper}>
