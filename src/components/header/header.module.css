@@ -26,6 +26,18 @@
   margin: 0;
 }
 
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 700;
+  font-size: 1.25rem;
+  & svg {
+    margin-right: 0.25rem;
+  }
+}
+
 @media (min-width: 640px) {
   .header .outer {
     padding: 20px;
