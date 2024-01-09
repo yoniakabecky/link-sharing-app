@@ -1,65 +1,57 @@
 # Link Sharing App 🚀
 
-- [Qwik Docs](https://qwik.builder.io/)
-- [Discord](https://qwik.builder.io/chat)
-- [Qwik GitHub](https://github.com/BuilderIO/qwik)
-- [@QwikDev](https://twitter.com/QwikDev)
-- [Vite](https://vitejs.dev/)
+This is my [Qwik](https://qwik.builder.io/) practice project✨  
+  
+The original idea and designs are from [Frontend Mentor](https://www.frontendmentor.io/challenges/linksharing-app-Fbt7yweGsT).
 
----
+## Overview 👀
 
-## Project Structure
+### Built with
 
-This project is using Qwik with [QwikCity](https://qwik.builder.io/qwikcity/overview/). QwikCity is just an extra set of tools on top of Qwik to make it easier to build a full site, including directory-based routing, layouts, and more.
+- [Qwik](https://qwik.builder.io/)
+- [Modular Forms](https://modularforms.dev/)
+- [Valibot](https://valibot.dev/)
+- [json-server](https://github.com/typicode/json-server) - until I implement database
 
-Inside your project, you'll see the following directory structure:
+### The original challenge
 
-```
-├── public/
-│   └── ...
-└── src/
-    ├── components/
-    │   └── ...
-    └── routes/
-        └── ...
-```
+Users should be able to:
 
-- `src/routes`: Provides the directory-based routing, which can include a hierarchy of `layout.tsx` layout files, and an `index.tsx` file as the page. Additionally, `index.ts` files are endpoints. Please see the [routing docs](https://qwik.builder.io/qwikcity/routing/overview/) for more info.
+- [x] Create, read, update, delete links and see previews in the mobile mockup
+- [x] Receive validations if the links form is submitted without a URL or with the wrong URL pattern for the platform
+- [ ] Drag and drop links to reorder them
+- [ ] Add profile details like profile picture, first name, last name, and email  
+    → profile picture is not done yet
+- [x] Receive validations if the profile details form is saved with no first or last name
+- [x] Preview their devlinks profile and copy the link to their clipboard
+- [x] View the optimal layout for the interface depending on their device's screen size
+- [x] See hover and focus states for all interactive elements on the page
+- [ ] Bonus: Save details to a database (build the project as a full-stack app)
+- [ ] Bonus: Create an account and log in (add user authentication to the full-stack app)
 
-- `src/components`: Recommended directory for components.
 
-- `public`: Any static assets, like images, can be placed in the public directory. Please see the [Vite public directory](https://vitejs.dev/guide/assets.html#the-public-directory) for more info.
+## Try out in a local environment 👩‍💻
 
-## Add Integrations and deployment
-
-Use the `pnpm qwik add` command to add additional integrations. Some examples of integrations includes: Cloudflare, Netlify or Express Server, and the [Static Site Generator (SSG)](https://qwik.builder.io/qwikcity/guides/static-site-generation/).
-
-```shell
-pnpm qwik add # or `pnpm qwik add`
-```
-
-## Development
-
-Development mode uses [Vite's development server](https://vitejs.dev/). The `dev` command will server-side render (SSR) the output during development.
+### 1. Install dependencies 
 
 ```shell
-npm start # or `pnpm start`
+pnpm i
 ```
 
-> Note: during dev mode, Vite may request a significant number of `.js` files. This does not represent a Qwik production build.
+I'm using [pnpm](https://pnpm.io/) 😉
 
-## Preview
-
-The preview command will create a production build of the client modules, a production build of `src/entry.preview.tsx`, and run a local server. The preview server is only for convenience to preview a production build locally and should not be used as a production server.
+### 2. Run json-server
 
 ```shell
-pnpm preview # or `pnpm preview`
+pnpm run json # or npx json-server ./data/db.json
 ```
 
-## Production
+This will run on "https://localhost:3000" by default. If you want to change the port, use the `--port` flag.
 
-The production build will generate client and server modules by running both client and server build commands. The build command will use Typescript to run a type check on the source code.
+### 3. Start development server
 
 ```shell
-pnpm build # or `pnpm build`
+pnpm start
 ```
+
+...and Voila! 🥳
