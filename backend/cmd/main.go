@@ -3,20 +3,24 @@ package main
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func main() {
-	server := &http.Server{
-		Addr:    ":8080",
-		Handler: http.HandlerFunc(handler),
-	}
-
-	err := server.ListenAndServe()
-	if err != nil {
-		fmt.Println("failed to listen to server", err)
-	}
+	addr := ":8080"
+	fmt.Printf("Starting server on %v\n", addr)
+	http.ListenAndServe(addr, router())
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello, World"))
+func router() http.Handler {
+	r := chi.NewRouter()
+
+	r.Group(func(r chi.Router) {
+		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("Hello, anonymous"))
+		})
+	})
+
+	return r
 }
