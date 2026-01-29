@@ -1,0 +1,12 @@
+FROM golang:1.25-alpine
+
+WORKDIR /backend
+
+RUN go install github.com/air-verse/air@latest
+
+COPY backend/go.* ./
+RUN go mod download
+
+COPY backend/ .
+
+CMD ["air", "-c", ".air.toml"]
