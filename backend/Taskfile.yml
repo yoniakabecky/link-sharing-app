@@ -5,6 +5,9 @@ version: "3"
 vars:
   GREETING: Hello, World!
 
+dotenv:
+  - ".env"
+
 tasks:
   default:
     cmds:
@@ -14,3 +17,35 @@ tasks:
   run_server:
     cmds:
       - air run ./cmd/main.go
+
+  migrate_new:
+    desc: Create a new migration (e.g. task migrate_new -- init_schema)
+    cmds:
+      - dbmate new "{{.CLI_ARGS}}"
+
+  migrate_up:
+    desc: Run migrations
+    cmds:
+      - dbmate up
+
+  migrate_down:
+    desc: Rollback last migration
+    cmds:
+      - dbmate down
+
+  create_db:
+    desc: Create database
+    cmds:
+      - dbmate create
+
+  drop_db:
+    desc: Drop database
+    cmds:
+      - dbmate drop
+
+  reset_db:
+    desc: Reset database
+    cmds:
+      - task drop_db
+      - task create_db
+      - task migrate_up
