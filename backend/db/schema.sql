@@ -116,5 +116,6 @@ CREATE TABLE `users` (
 
 LOCK TABLES `schema_migrations` WRITE;
 INSERT INTO `schema_migrations` (version) VALUES
-  ('20260129134153');
+  ('20260129134153'),
+  ('20260130122009');
 UNLOCK TABLES;
