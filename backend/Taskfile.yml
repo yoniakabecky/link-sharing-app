@@ -16,7 +16,7 @@ tasks:
 
   run_server:
     cmds:
-      - air run ./cmd/main.go
+      - air run ./cmd/app/main.go
 
   migrate_new:
     desc: Create a new migration (e.g. task migrate_new -- init_schema)
