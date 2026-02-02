@@ -1,35 +1,40 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
-	"net/http"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/yoniakabecky/link-sharing-app/backend/db"
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/handlers"
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/repositories"
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/services"
 )
 
 func main() {
-	db, err := db.NewDatabase()
+	// Initialize database
+	dbConn, err := db.NewDatabase()
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
-	defer db.Close()
+	defer dbConn.Close()
 	log.Println("Connected to database")
 
+	// Initialize dependencies
+	prepo := repositories.NewPlatformRepository(dbConn.GetDB())
+	psrv := services.NewPlatformServices(prepo)
+	phdl := handlers.NewPlatformHandler(psrv)
+
+	// Register routes
+	h := &handlers.Handlers{
+		Platform: phdl,
+	}
+	router := handlers.RegisterRoutes(h)
+
+	// Start server
 	addr := ":8080"
-	fmt.Printf("Starting server on %v\n", addr)
-	http.ListenAndServe(addr, router())
-}
-
-func router() http.Handler {
-	r := chi.NewRouter()
-
-	r.Group(func(r chi.Router) {
-		r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("Hello, anonymous"))
-		})
-	})
-
-	return r
+	app := New(router, addr)
+	log.Println("Starting server on port", addr)
+	if err := app.Start(context.Background()); err != nil {
+		log.Fatalf("failed to start server: %v", err)
+	}
 }
