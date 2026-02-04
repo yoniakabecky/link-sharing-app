@@ -9,6 +9,7 @@ type Profile struct {
 	LastName  string     `json:"last_name" db:"last_name"`
 	Email     string     `json:"email" db:"email"`
 	AvatarURL string     `json:"avatar_url" db:"avatar_url"`
+	CreatedAt time.Time  `json:"created_at" db:"created_at"`
 	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
 	Links     []Link     `json:"links"`
 }

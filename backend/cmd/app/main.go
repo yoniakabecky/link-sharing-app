@@ -21,12 +21,16 @@ func main() {
 
 	// Initialize dependencies
 	prepo := repositories.NewPlatformRepository(dbConn.GetDB())
-	psrv := services.NewPlatformServices(prepo)
-	phdl := handlers.NewPlatformHandler(psrv)
+	plsrv := services.NewPlatformServices(prepo)
+	plhdl := handlers.NewPlatformHandler(plsrv)
+	prrepo := repositories.NewProfileRepository(dbConn.GetDB())
+	prsrv := services.NewProfileServices(prrepo)
+	prhdl := handlers.NewProfileHandler(prsrv)
 
 	// Register routes
 	h := &handlers.Handlers{
-		Platform: phdl,
+		Platform: plhdl,
+		Profile:  prhdl,
 	}
 	router := handlers.RegisterRoutes(h)
 
