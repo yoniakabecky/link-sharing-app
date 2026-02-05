@@ -4,6 +4,7 @@ version: "3"
 
 vars:
   GREETING: Hello, World!
+  DATABASE_URL: mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
 
 dotenv:
   - ".env"
@@ -21,27 +22,27 @@ tasks:
   migrate_new:
     desc: Create a new migration (e.g. task migrate_new -- init_schema)
     cmds:
-      - dbmate new "{{.CLI_ARGS}}"
+      - DATABASE_URL={{ .DATABASE_URL }} dbmate new "{{.CLI_ARGS}}"
 
   migrate_up:
     desc: Run migrations
     cmds:
-      - dbmate up
+      - DATABASE_URL={{ .DATABASE_URL }} dbmate up
 
   migrate_down:
     desc: Rollback last migration
     cmds:
-      - dbmate down
+      - DATABASE_URL={{ .DATABASE_URL }} dbmate down
 
   create_db:
     desc: Create database
     cmds:
-      - dbmate create
+      - DATABASE_URL={{ .DATABASE_URL }} dbmate create
 
   drop_db:
     desc: Drop database
     cmds:
-      - dbmate drop
+      - DATABASE_URL={{ .DATABASE_URL }} dbmate drop
 
   reset_db:
     desc: Reset database
