@@ -4,44 +4,29 @@ import (
 	"context"
 	"log"
 
-	"github.com/yoniakabecky/link-sharing-app/backend/db"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/config"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/handlers"
-	"github.com/yoniakabecky/link-sharing-app/backend/internal/repositories"
-	"github.com/yoniakabecky/link-sharing-app/backend/internal/services"
 )
 
 func main() {
 	cfg := config.Load()
 
-	// Initialize database
-	dbConn, err := db.NewDatabase(cfg.Database.DSN())
+	deps, err := InitializeDependencies(cfg)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatalf("failed to initialize dependencies: %v", err)
 	}
-	defer dbConn.Close()
+	defer func() {
+		if err := deps.DB.Close(); err != nil {
+			log.Printf("error closing database: %v", err)
+		}
+	}()
 	log.Println("Connected to database")
 
-	// Initialize dependencies
-	prepo := repositories.NewPlatformRepository(dbConn.GetDB())
-	plsrv := services.NewPlatformServices(prepo)
-	plhdl := handlers.NewPlatformHandler(plsrv)
-	prrepo := repositories.NewProfileRepository(dbConn.GetDB())
-	prsrv := services.NewProfileServices(prrepo)
-	prhdl := handlers.NewProfileHandler(prsrv)
+	r := handlers.RegisterRoutes(deps.Handlers)
 
-	// Register routes
-	h := &handlers.Handlers{
-		Platform: plhdl,
-		Profile:  prhdl,
-	}
-	router := handlers.RegisterRoutes(h)
-
-	// Start server
-	addr := ":8080"
-	app := New(router, addr)
-	log.Println("Starting server on port", addr)
-	if err := app.Start(context.Background()); err != nil {
+	app := New(r, cfg.Server.Address)
+	ctx := context.Background()
+	if err := app.Start(ctx); err != nil {
 		log.Fatalf("failed to start server: %v", err)
 	}
 }
