@@ -5,14 +5,17 @@ import (
 	"log"
 
 	"github.com/yoniakabecky/link-sharing-app/backend/db"
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/config"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/handlers"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/repositories"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/services"
 )
 
 func main() {
+	cfg := config.Load()
+
 	// Initialize database
-	dbConn, err := db.NewDatabase()
+	dbConn, err := db.NewDatabase(cfg.Database.DSN())
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}

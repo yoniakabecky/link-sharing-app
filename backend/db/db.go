@@ -11,11 +11,15 @@ type Database struct {
 	db *sqlx.DB
 }
 
-func NewDatabase() (*Database, error) {
-	dns := "root:root_password@tcp(localhost:3306)/link-sharing-app?parseTime=true"
-	db, err := sqlx.Open("mysql", dns)
+func NewDatabase(dsn string) (*Database, error) {
+	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("failed opening database: %w", err)
+	}
+
+	// Test the connection
+	if err := db.Ping(); err != nil {
+		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
 	return &Database{db: db}, nil
