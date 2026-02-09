@@ -98,11 +98,20 @@ func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile
 			return fmt.Errorf("error updating profile: %w", err)
 		}
 
+		// TODO: handle deleted links
+
+		isModified := false
 		for _, l := range p.Links {
 			l.ProfileID = p.ID
 			err := updateLink(ctx, tx, l)
 			if err != nil {
 				return fmt.Errorf("error updating link: %w", err)
+			}
+			isModified = true
+		}
+		if isModified {
+			if err := touchProfileUpdatedAt(ctx, tx, p.ID); err != nil {
+				return fmt.Errorf("error touching profile updated at: %w", err)
 			}
 		}
 		return nil
@@ -132,6 +141,14 @@ func updateLink(ctx context.Context, tx *sqlx.Tx, l models.Link) error {
 	_, err := tx.NamedExecContext(ctx, "UPDATE links SET url = :url WHERE id = :id", l)
 	if err != nil {
 		return fmt.Errorf("error updating link: %w", err)
+	}
+	return nil
+}
+
+func touchProfileUpdatedAt(ctx context.Context, tx *sqlx.Tx, pID int) error {
+	_, err := tx.ExecContext(ctx, "UPDATE profiles SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", pID)
+	if err != nil {
+		return fmt.Errorf("error touching profile updated at: %w", err)
 	}
 	return nil
 }
