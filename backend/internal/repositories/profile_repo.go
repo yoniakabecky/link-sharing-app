@@ -41,7 +41,7 @@ func (r *ProfileRepository) CreateProfile(ctx context.Context, p *models.Profile
 
 	np, err := r.GetProfileByID(ctx, p.ID)
 	if err != nil {
-		return nil, fmt.Errorf("error getting profile: %w", err)
+		return nil, fmt.Errorf("error creating profile: %w", err)
 	}
 	return np, nil
 }
@@ -85,7 +85,7 @@ func (r *ProfileRepository) GetProfileByID(ctx context.Context, id int) (*models
 	var links []models.Link
 	err = r.db.SelectContext(ctx, &links, "SELECT * FROM links WHERE profile_id = ?", id)
 	if err != nil {
-		return nil, fmt.Errorf("error getting links: %w", err)
+		return nil, fmt.Errorf("error getting profile: %w", err)
 	}
 	p.Links = links
 	return &p, nil
@@ -105,13 +105,13 @@ func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile
 			l.ProfileID = p.ID
 			err := updateLink(ctx, tx, l)
 			if err != nil {
-				return fmt.Errorf("error updating link: %w", err)
+				return fmt.Errorf("error updating profile: %w", err)
 			}
 			isModified = true
 		}
 		if isModified {
 			if err := touchProfileUpdatedAt(ctx, tx, p.ID); err != nil {
-				return fmt.Errorf("error touching profile updated at: %w", err)
+				return fmt.Errorf("error updating profile: %w", err)
 			}
 		}
 		return nil
@@ -122,7 +122,7 @@ func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile
 
 	up, err := r.GetProfileByID(ctx, p.ID)
 	if err != nil {
-		return nil, fmt.Errorf("error getting profile: %w", err)
+		return nil, fmt.Errorf("error updating profile: %w", err)
 	}
 	return up, nil
 }
@@ -136,8 +136,9 @@ func updateProfile(ctx context.Context, tx *sqlx.Tx, p *models.Profile) (*models
 }
 
 func updateLink(ctx context.Context, tx *sqlx.Tx, l models.Link) error {
-	// TODO: if link is not found, create it
-
+	if l.ID == 0 {
+		return createLink(ctx, tx, l)
+	}
 	_, err := tx.NamedExecContext(ctx, "UPDATE links SET url = :url WHERE id = :id", l)
 	if err != nil {
 		return fmt.Errorf("error updating link: %w", err)
