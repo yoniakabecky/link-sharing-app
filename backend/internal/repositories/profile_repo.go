@@ -82,13 +82,21 @@ func (r *ProfileRepository) GetProfileByID(ctx context.Context, id int) (*models
 		return nil, fmt.Errorf("error getting profile: %w", err)
 	}
 
-	var links []models.Link
-	err = r.db.SelectContext(ctx, &links, "SELECT * FROM links WHERE profile_id = ?", id)
+	links, err := r.getLinksByProfileID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("error getting profile: %w", err)
 	}
 	p.Links = links
 	return &p, nil
+}
+
+func (r *ProfileRepository) getLinksByProfileID(ctx context.Context, pID int) ([]models.Link, error) {
+	var links []models.Link
+	err := r.db.SelectContext(ctx, &links, "SELECT * FROM links WHERE profile_id = ?", pID)
+	if err != nil {
+		return nil, fmt.Errorf("error getting links: %w", err)
+	}
+	return links, nil
 }
 
 func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile) (*models.Profile, error) {
@@ -98,9 +106,26 @@ func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile
 			return fmt.Errorf("error updating profile: %w", err)
 		}
 
-		// TODO: handle deleted links
+		linkIDs := make(map[int]struct{}, len(p.Links))
+		for _, l := range p.Links {
+			linkIDs[l.ID] = struct{}{}
+		}
+
+		cls, err := r.getLinksByProfileID(ctx, p.ID)
+		if err != nil {
+			return fmt.Errorf("error updating profile: %w", err)
+		}
 
 		isModified := false
+		for _, l := range cls {
+			if _, keep := linkIDs[l.ID]; !keep {
+				err := deleteLinkByID(ctx, tx, l.ID)
+				if err != nil {
+					return fmt.Errorf("error updating profile: %w", err)
+				}
+				isModified = true
+			}
+		}
 		for _, l := range p.Links {
 			l.ProfileID = p.ID
 			err := updateLink(ctx, tx, l)
@@ -139,7 +164,7 @@ func updateLink(ctx context.Context, tx *sqlx.Tx, l models.Link) error {
 	if l.ID == 0 {
 		return createLink(ctx, tx, l)
 	}
-	_, err := tx.NamedExecContext(ctx, "UPDATE links SET url = :url WHERE id = :id", l)
+	_, err := tx.NamedExecContext(ctx, "UPDATE links SET platform_id = :platform_id, url = :url WHERE id = :id", l)
 	if err != nil {
 		return fmt.Errorf("error updating link: %w", err)
 	}
@@ -169,6 +194,14 @@ func (r *ProfileRepository) DeleteProfile(ctx context.Context, id int) error {
 	})
 	if err != nil {
 		return fmt.Errorf("error deleting profile: %w", err)
+	}
+	return nil
+}
+
+func deleteLinkByID(ctx context.Context, tx *sqlx.Tx, lID int) error {
+	_, err := tx.ExecContext(ctx, "DELETE FROM links WHERE id = ?", lID)
+	if err != nil {
+		return fmt.Errorf("error deleting link: %w", err)
 	}
 	return nil
 }
