@@ -1,1 +1,5 @@
-<h1>Preview Page</h1>
+<script>
+	import Card from '$lib/components/Card.svelte';
+</script>
+
+<Card>Preview Page</Card>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Header from './Header.svelte';
+	import Header from '../Header.svelte';
 
 	let { children } = $props();
 </script>
@@ -22,10 +22,9 @@
 
 	.app main {
 		flex: 1;
-		display: grid;
-		grid-template-columns: 1fr 60%;
-		gap: var(--spacing-5);
-		padding: var(--spacing-5);
-		padding-block-start: 0;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 	}
 </style>
