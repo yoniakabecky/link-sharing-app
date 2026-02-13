@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import logo from '$lib/assets/logo.svg';
+	import Button from '$lib/components/Button.svelte';
 
 	let isPreview = $derived(page.url.pathname === '/preview');
+	let pathname = $derived(page.url.pathname);
 </script>
 
 {#snippet MainNav()}
@@ -12,16 +14,22 @@
 
 	<nav>
 		<ul>
-			<li><a href="/links">LINKS</a></li>
-			<li><a href="/profile">PROFILE</a></li>
+			<li>
+				<Button variant="subtle" data-active={pathname === '/links'} href="/links">Links</Button>
+			</li>
+			<li>
+				<Button variant="subtle" data-active={pathname === '/profile'} href="/profile">
+					Profile
+				</Button>
+			</li>
 		</ul>
 	</nav>
-	<div><a href="/preview">PREVIEW</a></div>
+	<Button variant="outlined" href="/preview">Preview</Button>
 {/snippet}
 
 {#snippet PreviewNav()}
-	<div><a href="/links">BACK TO EDITOR</a></div>
-	<div><a href="/">SHARE LINK</a></div>
+	<Button variant="outlined" href="/links">Back to Editor</Button>
+	<Button href="/">Share Link</Button>
 {/snippet}
 
 <header>
