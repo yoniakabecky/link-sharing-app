@@ -4,9 +4,11 @@
 	import Mockup from '$lib/components/Mockup.svelte';
 </script>
 
-<Card>
-	<Mockup showSkeleton={true} />
-</Card>
+<div class="desktop-only">
+	<Card>
+		<Mockup showSkeleton={true} />
+	</Card>
+</div>
 
 <Card>
 	{#snippet header()}

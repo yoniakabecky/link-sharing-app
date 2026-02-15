@@ -28,4 +28,10 @@
 		padding: var(--spacing-5);
 		padding-block-start: 0;
 	}
+
+	@media (max-width: 480px) {
+		.app main {
+			grid-template-columns: 1fr;
+		}
+	}
 </style>

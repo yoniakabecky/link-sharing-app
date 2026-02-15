@@ -28,9 +28,11 @@
 	] as Link[];
 </script>
 
-<Card>
-	<Mockup profile={dummyProfile} links={dummyLinks} />
-</Card>
+<div class="desktop-only">
+	<Card>
+		<Mockup profile={dummyProfile} links={dummyLinks} />
+	</Card>
+</div>
 
 <Card>
 	{#snippet header()}
