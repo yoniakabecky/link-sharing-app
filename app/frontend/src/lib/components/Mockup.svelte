@@ -6,7 +6,7 @@
 
 	type Props = {
 		profile?: Profile;
-		links?: Link[];
+		links?: Partial<Link>[];
 		showSkeleton?: boolean;
 	};
 	let { profile, links, showSkeleton }: Props = $props();
@@ -44,11 +44,11 @@
 		<div class="links">
 			{#if links && links.length > 0}
 				{#each links as link}
-					<div class="link" style="background-color: {link.platform.color};">
+					<div class="link" style="background-color: {link.platform!.color};">
 						<!-- TODO: create link button component -->
 						<div class="platform">
-							<Icon name={link.platform.icon as IconName} size={14} />
-							<div>{link.platform.name}</div>
+							<Icon name={link.platform!.icon as IconName} size={14} />
+							<div>{link.platform!.name}</div>
 						</div>
 						<Icon name="arrow_right" size={14} />
 					</div>
