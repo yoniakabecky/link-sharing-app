@@ -4,6 +4,7 @@
 	import Mockup from '$lib/components/Mockup.svelte';
 	import type { Link } from '$lib/models/link';
 	import type { Profile } from '$lib/models/profile';
+	import ProfileForm from './ProfileForm.svelte';
 
 	const dummyProfile = {
 		id: 1,
@@ -29,7 +30,7 @@
 </script>
 
 <div class="desktop-only">
-	<Card>
+	<Card style="block-size: 100%;">
 		<Mockup profile={dummyProfile} links={dummyLinks} />
 	</Card>
 </div>
@@ -40,7 +41,7 @@
 		<p class="description">Add your details to create a personal touch to your profile.</p>
 	{/snippet}
 
-	form here
+	<ProfileForm profile={dummyProfile} />
 
 	{#snippet footer()}
 		<div class="end">
