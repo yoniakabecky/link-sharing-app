@@ -2,7 +2,7 @@
 	import mock from '$lib/assets/mobile-mock.svg';
 	import type { Link } from '$lib/models/link';
 	import type { Profile } from '$lib/models/profile';
-	import Icon, { type IconName } from './Icon.svelte';
+	import PlatformButton from './PlatformButton.svelte';
 
 	type Props = {
 		profile?: Profile;
@@ -44,13 +44,8 @@
 		<div class="links">
 			{#if links && links.length > 0}
 				{#each links as link}
-					<div class="link" style="background-color: {link.platform!.color};">
-						<!-- TODO: create link button component -->
-						<div class="platform">
-							<Icon name={link.platform!.icon as IconName} size={14} />
-							<div>{link.platform!.name}</div>
-						</div>
-						<Icon name="arrow_right" size={14} />
+					<div class="link">
+						<PlatformButton link={link as Link} size="sm" />
 					</div>
 				{/each}
 			{:else if showSkeleton && (links ?? []).length < maxDisplayLinks}
@@ -146,21 +141,8 @@
 	}
 
 	.link {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		inline-size: 100%;
-		block-size: var(--spacing-9);
-		border-radius: var(--radius-sm);
-		padding: var(--spacing-3);
-		font-size: var(--font-size-xs);
-		color: var(--color-text-inverted);
-	}
-
-	.link .platform {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-2);
+		block-size: 38px;
+		inline-size: 200px;
 	}
 
 	.link.skeleton {
