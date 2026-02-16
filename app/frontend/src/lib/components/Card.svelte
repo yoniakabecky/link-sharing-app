@@ -5,12 +5,13 @@
 		header?: Snippet;
 		children: Snippet;
 		footer?: Snippet;
+		shadow?: boolean;
 	} & svelteHTML.IntrinsicElements['div'];
 
-	let { children, header, footer, ...props }: Props = $props();
+	let { children, header, footer, shadow = false, ...props }: Props = $props();
 </script>
 
-<div class="card" {...props}>
+<div class="card" data-shadow={shadow} {...props}>
 	{#if header}
 		<header>
 			{@render header()}
@@ -67,5 +68,9 @@
 		border-bottom-right-radius: var(--radius-md);
 		background-color: var(--color-card);
 		border-top: 1px solid var(--color-border-gray);
+	}
+
+	.card[data-shadow='true'] {
+		box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
 	}
 </style>

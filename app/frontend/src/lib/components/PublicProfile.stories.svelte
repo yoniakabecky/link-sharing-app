@@ -1,8 +1,12 @@
-<script lang="ts">
-	import Card from '$lib/components/Card.svelte';
-	import PublicProfile from '$lib/components/PublicProfile.svelte';
+<script module>
+	import { defineMeta } from '@storybook/addon-svelte-csf';
+	import PublicProfile from './PublicProfile.svelte';
 
-	// TODO: fetch profile from API
+	const { Story } = defineMeta({
+		title: 'Components/PublicProfile',
+		component: PublicProfile
+	});
+
 	const profile = {
 		id: 1,
 		user_id: 1,
@@ -30,18 +34,13 @@
 				url: 'https://example.com',
 				platform: {
 					id: 2,
-					name: 'Twitter',
-					icon: 'social_x',
-					color: '#000000'
+					name: 'LinkedIn',
+					icon: 'linkedin',
+					color: '#0077B5'
 				}
 			}
 		]
 	};
 </script>
 
-<Card shadow={true}>
-	<PublicProfile {profile} />
-</Card>
-
-<style>
-</style>
+<Story name="Default" args={{ profile }} />
