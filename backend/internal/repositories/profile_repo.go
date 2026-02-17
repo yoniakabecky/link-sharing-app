@@ -9,12 +9,14 @@ import (
 )
 
 type ProfileRepository struct {
-	db *sqlx.DB
+	db    *sqlx.DB
+	lRepo *LinkRepository
 }
 
-func NewProfileRepository(db *sqlx.DB) *ProfileRepository {
+func NewProfileRepository(db *sqlx.DB, linkRepo *LinkRepository) *ProfileRepository {
 	return &ProfileRepository{
-		db: db,
+		db:    db,
+		lRepo: linkRepo,
 	}
 }
 
@@ -25,10 +27,9 @@ func (r *ProfileRepository) CreateProfile(ctx context.Context, p *models.Profile
 			return fmt.Errorf("error creating profile: %w", err)
 		}
 
-		for _, l := range p.Links {
-			l.ProfileID = p.ID
-			err := createLink(ctx, tx, l)
-			if err != nil {
+		for i := range p.Links {
+			p.Links[i].ProfileID = p.ID
+			if err := r.lRepo.CreateLinkTx(ctx, tx, &p.Links[i]); err != nil {
 				return fmt.Errorf("error creating link: %w", err)
 			}
 		}
@@ -62,19 +63,6 @@ func createProfile(ctx context.Context, tx *sqlx.Tx, p *models.Profile) (*models
 	return p, nil
 }
 
-func createLink(ctx context.Context, tx *sqlx.Tx, link models.Link) error {
-	l, err := tx.NamedExecContext(ctx, "INSERT INTO links (profile_id, platform_id, url) VALUES (:profile_id, :platform_id, :url)", link)
-	if err != nil {
-		return fmt.Errorf("error inserting link: %w", err)
-	}
-	id, err := l.LastInsertId()
-	if err != nil {
-		return fmt.Errorf("error getting last insert ID: %w", err)
-	}
-	link.ID = int(id)
-	return nil
-}
-
 func (r *ProfileRepository) GetProfileByID(ctx context.Context, id int) (*models.Profile, error) {
 	var p models.Profile
 	err := r.db.GetContext(ctx, &p, "SELECT * FROM profiles WHERE id = ?", id)
@@ -82,21 +70,12 @@ func (r *ProfileRepository) GetProfileByID(ctx context.Context, id int) (*models
 		return nil, fmt.Errorf("error getting profile: %w", err)
 	}
 
-	links, err := r.getLinksByProfileID(ctx, id)
+	links, err := r.lRepo.GetLinksByProfileID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("error getting profile: %w", err)
 	}
 	p.Links = links
 	return &p, nil
-}
-
-func (r *ProfileRepository) getLinksByProfileID(ctx context.Context, pID int) ([]models.Link, error) {
-	var links []models.Link
-	err := r.db.SelectContext(ctx, &links, "SELECT * FROM links WHERE profile_id = ?", pID)
-	if err != nil {
-		return nil, fmt.Errorf("error getting links: %w", err)
-	}
-	return links, nil
 }
 
 func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile) (*models.Profile, error) {
@@ -111,31 +90,21 @@ func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile
 			linkIDs[l.ID] = struct{}{}
 		}
 
-		cls, err := r.getLinksByProfileID(ctx, p.ID)
+		cls, err := r.lRepo.GetLinksByProfileIDTx(ctx, tx, p.ID)
 		if err != nil {
 			return fmt.Errorf("error updating profile: %w", err)
 		}
 
-		isModified := false
 		for _, l := range cls {
 			if _, keep := linkIDs[l.ID]; !keep {
-				err := deleteLinkByID(ctx, tx, l.ID)
-				if err != nil {
+				if err := r.lRepo.DeleteLinkByIDTx(ctx, tx, l.ID); err != nil {
 					return fmt.Errorf("error updating profile: %w", err)
 				}
-				isModified = true
 			}
 		}
-		for _, l := range p.Links {
-			l.ProfileID = p.ID
-			err := updateLink(ctx, tx, l)
-			if err != nil {
-				return fmt.Errorf("error updating profile: %w", err)
-			}
-			isModified = true
-		}
-		if isModified {
-			if err := touchProfileUpdatedAt(ctx, tx, p.ID); err != nil {
+		for i := range p.Links {
+			p.Links[i].ProfileID = p.ID
+			if err := r.lRepo.UpdateLinkTx(ctx, tx, &p.Links[i]); err != nil {
 				return fmt.Errorf("error updating profile: %w", err)
 			}
 		}
@@ -160,25 +129,6 @@ func updateProfile(ctx context.Context, tx *sqlx.Tx, p *models.Profile) (*models
 	return p, nil
 }
 
-func updateLink(ctx context.Context, tx *sqlx.Tx, l models.Link) error {
-	if l.ID == 0 {
-		return createLink(ctx, tx, l)
-	}
-	_, err := tx.NamedExecContext(ctx, "UPDATE links SET platform_id = :platform_id, url = :url WHERE id = :id", l)
-	if err != nil {
-		return fmt.Errorf("error updating link: %w", err)
-	}
-	return nil
-}
-
-func touchProfileUpdatedAt(ctx context.Context, tx *sqlx.Tx, pID int) error {
-	_, err := tx.ExecContext(ctx, "UPDATE profiles SET updated_at = CURRENT_TIMESTAMP WHERE id = ?", pID)
-	if err != nil {
-		return fmt.Errorf("error touching profile updated at: %w", err)
-	}
-	return nil
-}
-
 func (r *ProfileRepository) DeleteProfile(ctx context.Context, id int) error {
 	err := r.execTx(ctx, func(tx *sqlx.Tx) error {
 		_, err := tx.ExecContext(ctx, "DELETE FROM profiles WHERE id = ?", id)
@@ -194,14 +144,6 @@ func (r *ProfileRepository) DeleteProfile(ctx context.Context, id int) error {
 	})
 	if err != nil {
 		return fmt.Errorf("error deleting profile: %w", err)
-	}
-	return nil
-}
-
-func deleteLinkByID(ctx context.Context, tx *sqlx.Tx, lID int) error {
-	_, err := tx.ExecContext(ctx, "DELETE FROM links WHERE id = ?", lID)
-	if err != nil {
-		return fmt.Errorf("error deleting link: %w", err)
 	}
 	return nil
 }

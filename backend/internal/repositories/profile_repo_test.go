@@ -188,7 +188,7 @@ func TestCreateProfile(t *testing.T) {
 	for _, tc := range tsc {
 		t.Run(tc.name, func(t *testing.T) {
 			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
-				repo := NewProfileRepository(db)
+				repo := NewProfileRepository(db, NewLinkRepository(db))
 				tc.test(t, repo, mock)
 			})
 		})
@@ -279,7 +279,7 @@ func TestGetProfileByID(t *testing.T) {
 	for _, tc := range tsc {
 		t.Run(tc.name, func(t *testing.T) {
 			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
-				repo := NewProfileRepository(db)
+				repo := NewProfileRepository(db, NewLinkRepository(db))
 				tc.test(t, repo, mock)
 			})
 		})
@@ -318,7 +318,6 @@ func TestUpdateProfile(t *testing.T) {
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectExec("UPDATE profiles SET updated_at = CURRENT_TIMESTAMP WHERE id = ?").WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit()
 
 				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
@@ -391,7 +390,6 @@ func TestUpdateProfile(t *testing.T) {
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectExec("UPDATE profiles SET updated_at = CURRENT_TIMESTAMP WHERE id = ?").WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit().WillReturnError(errors.New("failed to commit transaction"))
 
 				_, err := repo.UpdateProfile(context.Background(), p)
@@ -438,7 +436,6 @@ func TestUpdateProfile(t *testing.T) {
 						AddRow(2, 1, 2, "https://example.org", now, nil))
 				mock.ExpectExec("DELETE FROM links WHERE id = ?").WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectExec("UPDATE profiles SET updated_at = CURRENT_TIMESTAMP WHERE id = ?").WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit()
 
 				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
@@ -478,7 +475,6 @@ func TestUpdateProfile(t *testing.T) {
 						AddRow(1, 1, 1, "https://example.com", now, nil))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url) VALUES (?, ?, ?)").WillReturnResult(sqlmock.NewResult(2, 1))
-				mock.ExpectExec("UPDATE profiles SET updated_at = CURRENT_TIMESTAMP WHERE id = ?").WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit()
 
 				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
@@ -514,7 +510,40 @@ func TestUpdateProfile(t *testing.T) {
 			},
 		},
 		{
-			name: "failed to touch profile updated_at",
+			name: "success with no link changes",
+			test: func(t *testing.T, repo *ProfileRepository, mock sqlmock.Sqlmock) {
+				now := time.Now()
+				pNoLinks := &models.Profile{
+					ID:        1,
+					FirstName: "John",
+					LastName:  "Doe",
+					Email:     "john.doe@example.com",
+					AvatarURL: "https://example.com/avatar.png",
+					Links:     []models.Link{},
+				}
+				mock.ExpectBegin()
+				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}))
+				mock.ExpectCommit()
+
+				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
+					AddRow(1, 0, "John", "Doe", "john.doe@example.com", "https://example.com/avatar.png", now, nil)
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnRows(prow)
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}))
+
+				result, err := repo.UpdateProfile(context.Background(), pNoLinks)
+				require.NoError(t, err)
+				require.Equal(t, 1, result.ID)
+				require.Empty(t, result.Links)
+
+				err = mock.ExpectationsWereMet()
+				require.NoError(t, err)
+			},
+		},
+		{
+			name: "failed GetProfileByID after update",
 			test: func(t *testing.T, repo *ProfileRepository, mock sqlmock.Sqlmock) {
 				now := time.Now()
 				mock.ExpectBegin()
@@ -523,11 +552,13 @@ func TestUpdateProfile(t *testing.T) {
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectExec("UPDATE profiles SET updated_at = CURRENT_TIMESTAMP WHERE id = ?").WillReturnError(errors.New("failed to touch updated_at"))
-				mock.ExpectRollback()
+				mock.ExpectCommit()
+
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnError(errors.New("failed to get profile"))
 
 				_, err := repo.UpdateProfile(context.Background(), p)
 				require.Error(t, err)
+				require.Contains(t, err.Error(), "error updating profile")
 
 				err = mock.ExpectationsWereMet()
 				require.NoError(t, err)
@@ -568,7 +599,7 @@ func TestUpdateProfile(t *testing.T) {
 	for _, tc := range tsc {
 		t.Run(tc.name, func(t *testing.T) {
 			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
-				repo := NewProfileRepository(db)
+				repo := NewProfileRepository(db, NewLinkRepository(db))
 				tc.test(t, repo, mock)
 			})
 		})
@@ -669,7 +700,7 @@ func TestDeleteProfile(t *testing.T) {
 	for _, tc := range tsc {
 		t.Run(tc.name, func(t *testing.T) {
 			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
-				repo := NewProfileRepository(db)
+				repo := NewProfileRepository(db, NewLinkRepository(db))
 				tc.test(t, repo, mock)
 			})
 		})
