@@ -9,12 +9,14 @@ import (
 )
 
 type LinkRepository struct {
-	db *sqlx.DB
+	db    *sqlx.DB
+	pRepo *PlatformRepository
 }
 
-func NewLinkRepository(db *sqlx.DB) *LinkRepository {
+func NewLinkRepository(db *sqlx.DB, pRepo *PlatformRepository) *LinkRepository {
 	return &LinkRepository{
-		db: db,
+		db:    db,
+		pRepo: pRepo,
 	}
 }
 
@@ -32,6 +34,13 @@ func (r *LinkRepository) getLinksByProfileID(ctx context.Context, prfID int) ([]
 	if err != nil {
 		return nil, fmt.Errorf("error getting links: %w", err)
 	}
+
+	for i := range links {
+		links[i].Platform, err = r.pRepo.GetPlatformByID(ctx, links[i].PlatformID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting links: %w", err)
+		}
+	}
 	return links, nil
 }
 
@@ -40,6 +49,13 @@ func (r *LinkRepository) getLinksByProfileIDTx(ctx context.Context, tx *sqlx.Tx,
 	err := tx.SelectContext(ctx, &links, "SELECT * FROM links WHERE profile_id = ?", prfID)
 	if err != nil {
 		return nil, fmt.Errorf("error getting links: %w", err)
+	}
+
+	for i := range links {
+		links[i].Platform, err = r.pRepo.GetPlatformByID(ctx, links[i].PlatformID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting links: %w", err)
+		}
 	}
 	return links, nil
 }

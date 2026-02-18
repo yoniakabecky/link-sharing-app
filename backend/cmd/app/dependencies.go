@@ -20,7 +20,7 @@ func InitializeDependencies(cfg *config.Config) (*Dependencies, error) {
 	}
 
 	pltRepo := repositories.NewPlatformRepository(dbConn.GetDB())
-	linkRepo := repositories.NewLinkRepository(dbConn.GetDB())
+	linkRepo := repositories.NewLinkRepository(dbConn.GetDB(), pltRepo)
 	prfRepo := repositories.NewProfileRepository(dbConn.GetDB(), linkRepo)
 
 	pltSrv := services.NewPlatformServices(pltRepo)

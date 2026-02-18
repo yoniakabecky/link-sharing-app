@@ -51,11 +51,15 @@ func TestCreateProfile(t *testing.T) {
 				now := time.Now()
 				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
 					AddRow(1, 1, "John", "Doe", "john.doe@example.com", "https://example.com/avatar.png", now, nil)
-				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnRows(prow)
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WithArgs(1).WillReturnRows(prow)
 				plrows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 					AddRow(1, 1, 1, "https://example.com", now, nil).
 					AddRow(2, 1, 2, "https://example.org", now, nil)
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(plrows)
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(plrows)
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(2).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(2, "Facebook", "facebook", "#000000"))
 
 				result, err := repo.CreateProfile(context.Background(), p)
 				require.NoError(t, err)
@@ -174,7 +178,7 @@ func TestCreateProfile(t *testing.T) {
 				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url) VALUES (?, ?, ?)").WillReturnResult(sqlmock.NewResult(2, 2))
 				mock.ExpectCommit()
 
-				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnError(errors.New("failed to get profile"))
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WithArgs(1).WillReturnError(errors.New("failed to get profile"))
 
 				_, err := repo.CreateProfile(context.Background(), p)
 				require.Error(t, err)
@@ -188,7 +192,9 @@ func TestCreateProfile(t *testing.T) {
 	for _, tc := range tsc {
 		t.Run(tc.name, func(t *testing.T) {
 			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
-				repo := NewProfileRepository(db, NewLinkRepository(db))
+				pRepo := NewPlatformRepository(db)
+				linkRepo := NewLinkRepository(db, pRepo)
+				repo := NewProfileRepository(db, linkRepo)
 				tc.test(t, repo, mock)
 			})
 		})
@@ -227,11 +233,16 @@ func TestGetProfileByID(t *testing.T) {
 		{
 			name: "success",
 			test: func(t *testing.T, repo *ProfileRepository, mock sqlmock.Sqlmock) {
-				prow := sqlmock.NewRows([]string{"id", "first_name", "last_name", "email", "avatar_url"}).AddRow(p.ID, p.FirstName, p.LastName, p.Email, p.AvatarURL)
-				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnRows(prow)
+				now := time.Now()
+				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).AddRow(p.ID, 1, p.FirstName, p.LastName, p.Email, p.AvatarURL, now, nil)
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WithArgs(1).WillReturnRows(prow)
 
-				plrows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url"}).AddRow(1, 1, 1, "https://example.com").AddRow(2, 1, 2, "https://example.org")
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(plrows)
+				plrows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).AddRow(1, 1, 1, "https://example.com", now, nil).AddRow(2, 1, 2, "https://example.org", now, nil)
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(plrows)
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(2).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(2, "Facebook", "facebook", "#000000"))
 
 				p, err := repo.GetProfileByID(context.Background(), 1)
 				require.NoError(t, err)
@@ -263,10 +274,11 @@ func TestGetProfileByID(t *testing.T) {
 		{
 			name: "failed to get links",
 			test: func(t *testing.T, repo *ProfileRepository, mock sqlmock.Sqlmock) {
-				prow := sqlmock.NewRows([]string{"id", "first_name", "last_name", "email", "avatar_url"}).AddRow(p.ID, p.FirstName, p.LastName, p.Email, p.AvatarURL)
-				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnRows(prow)
+				now := time.Now()
+				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).AddRow(p.ID, 1, p.FirstName, p.LastName, p.Email, p.AvatarURL, now, nil)
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WithArgs(1).WillReturnRows(prow)
 
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnError(errors.New("failed to get links"))
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnError(errors.New("failed to get links"))
 
 				_, err := repo.GetProfileByID(context.Background(), 1)
 				require.Error(t, err)
@@ -279,7 +291,9 @@ func TestGetProfileByID(t *testing.T) {
 	for _, tc := range tsc {
 		t.Run(tc.name, func(t *testing.T) {
 			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
-				repo := NewProfileRepository(db, NewLinkRepository(db))
+				pRepo := NewPlatformRepository(db)
+				linkRepo := NewLinkRepository(db, pRepo)
+				repo := NewProfileRepository(db, linkRepo)
 				tc.test(t, repo, mock)
 			})
 		})
@@ -314,18 +328,22 @@ func TestUpdateProfile(t *testing.T) {
 				now := time.Now()
 				mock.ExpectBegin()
 				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 
 				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
 					AddRow(1, 0, "John", "Doe", "john.doe@example.com", "https://example.com/avatar.png", now, nil)
-				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnRows(prow)
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WithArgs(1).WillReturnRows(prow)
 				plrows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 					AddRow(1, 1, 1, "https://example.com", now, nil)
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(plrows)
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(plrows)
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
 
 				result, err := repo.UpdateProfile(context.Background(), p)
 				require.NoError(t, err)
@@ -355,9 +373,11 @@ func TestUpdateProfile(t *testing.T) {
 				now := time.Now()
 				mock.ExpectBegin()
 				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnError(errors.New("failed to update links"))
 				mock.ExpectRollback()
 
@@ -386,9 +406,11 @@ func TestUpdateProfile(t *testing.T) {
 				now := time.Now()
 				mock.ExpectBegin()
 				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit().WillReturnError(errors.New("failed to commit transaction"))
 
@@ -430,20 +452,26 @@ func TestUpdateProfile(t *testing.T) {
 				}
 				mock.ExpectBegin()
 				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil).
 						AddRow(2, 1, 2, "https://example.org", now, nil))
-				mock.ExpectExec("DELETE FROM links WHERE id = ?").WillReturnResult(sqlmock.NewResult(0, 1))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(2).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(2, "Facebook", "facebook", "#000000"))
+				mock.ExpectExec("DELETE FROM links WHERE id = ?").WithArgs(2).WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 
 				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
 					AddRow(1, 0, "John", "Doe", "john.doe@example.com", "https://example.com/avatar.png", now, nil)
-				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnRows(prow)
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WithArgs(1).WillReturnRows(prow)
 				plrows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 					AddRow(1, 1, 1, "https://example.com/updated", now, nil)
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(plrows)
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(plrows)
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
 
 				result, err := repo.UpdateProfile(context.Background(), pWithOneLink)
 				require.NoError(t, err)
@@ -470,20 +498,26 @@ func TestUpdateProfile(t *testing.T) {
 				}
 				mock.ExpectBegin()
 				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url) VALUES (?, ?, ?)").WillReturnResult(sqlmock.NewResult(2, 1))
 				mock.ExpectCommit()
 
 				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
 					AddRow(1, 0, "John", "Doe", "john.doe@example.com", "https://example.com/avatar.png", now, nil)
-				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnRows(prow)
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WithArgs(1).WillReturnRows(prow)
 				plrows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 					AddRow(1, 1, 1, "https://example.com", now, nil).
 					AddRow(2, 1, 2, "https://example.org/new", now, nil)
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(plrows)
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(plrows)
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(2).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(2, "Facebook", "facebook", "#000000"))
 
 				result, err := repo.UpdateProfile(context.Background(), pWithNewLink)
 				require.NoError(t, err)
@@ -499,7 +533,7 @@ func TestUpdateProfile(t *testing.T) {
 			test: func(t *testing.T, repo *ProfileRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnError(errors.New("failed to get links"))
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnError(errors.New("failed to get links"))
 				mock.ExpectRollback()
 
 				_, err := repo.UpdateProfile(context.Background(), p)
@@ -523,14 +557,14 @@ func TestUpdateProfile(t *testing.T) {
 				}
 				mock.ExpectBegin()
 				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}))
 				mock.ExpectCommit()
 
 				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
 					AddRow(1, 0, "John", "Doe", "john.doe@example.com", "https://example.com/avatar.png", now, nil)
-				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnRows(prow)
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WithArgs(1).WillReturnRows(prow)
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}))
 
 				result, err := repo.UpdateProfile(context.Background(), pNoLinks)
@@ -548,13 +582,15 @@ func TestUpdateProfile(t *testing.T) {
 				now := time.Now()
 				mock.ExpectBegin()
 				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
 				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 
-				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WillReturnError(errors.New("failed to get profile"))
+				mock.ExpectQuery("SELECT * FROM profiles WHERE id = ?").WithArgs(1).WillReturnError(errors.New("failed to get profile"))
 
 				_, err := repo.UpdateProfile(context.Background(), p)
 				require.Error(t, err)
@@ -580,11 +616,15 @@ func TestUpdateProfile(t *testing.T) {
 				}
 				mock.ExpectBegin()
 				mock.ExpectExec("UPDATE profiles SET first_name = ?, last_name = ?, email = ?, avatar_url = ? WHERE id = ?").WillReturnResult(sqlmock.NewResult(1, 1))
-				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WillReturnRows(
+				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
 						AddRow(1, 1, 1, "https://example.com", now, nil).
 						AddRow(2, 1, 2, "https://example.org", now, nil))
-				mock.ExpectExec("DELETE FROM links WHERE id = ?").WillReturnError(errors.New("failed to delete link"))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
+				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(2).WillReturnRows(
+					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(2, "Facebook", "facebook", "#000000"))
+				mock.ExpectExec("DELETE FROM links WHERE id = ?").WithArgs(2).WillReturnError(errors.New("failed to delete link"))
 				mock.ExpectRollback()
 
 				_, err := repo.UpdateProfile(context.Background(), pWithOneLink)
@@ -599,7 +639,9 @@ func TestUpdateProfile(t *testing.T) {
 	for _, tc := range tsc {
 		t.Run(tc.name, func(t *testing.T) {
 			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
-				repo := NewProfileRepository(db, NewLinkRepository(db))
+				pRepo := NewPlatformRepository(db)
+				linkRepo := NewLinkRepository(db, pRepo)
+				repo := NewProfileRepository(db, linkRepo)
 				tc.test(t, repo, mock)
 			})
 		})
@@ -700,7 +742,9 @@ func TestDeleteProfile(t *testing.T) {
 	for _, tc := range tsc {
 		t.Run(tc.name, func(t *testing.T) {
 			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
-				repo := NewProfileRepository(db, NewLinkRepository(db))
+				pRepo := NewPlatformRepository(db)
+				linkRepo := NewLinkRepository(db, pRepo)
+				repo := NewProfileRepository(db, linkRepo)
 				tc.test(t, repo, mock)
 			})
 		})

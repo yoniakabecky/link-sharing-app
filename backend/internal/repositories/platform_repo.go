@@ -26,3 +26,12 @@ func (r *PlatformRepository) GetAll(ctx context.Context) ([]models.Platform, err
 	}
 	return platforms, nil
 }
+
+func (r *PlatformRepository) GetPlatformByID(ctx context.Context, id int) (*models.Platform, error) {
+	platform := models.Platform{}
+	err := r.db.Get(&platform, "SELECT * FROM platforms WHERE id = ?", id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get platform by ID: %w", err)
+	}
+	return &platform, nil
+}

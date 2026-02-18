@@ -20,3 +20,7 @@ func NewPlatformServices(repo *repositories.PlatformRepository) *PlatformService
 func (s *PlatformServices) GetAll(ctx context.Context) ([]models.Platform, error) {
 	return s.repo.GetAll(ctx)
 }
+
+func (s *PlatformServices) GetPlatformByID(ctx context.Context, id int) (*models.Platform, error) {
+	return s.repo.GetPlatformByID(ctx, id)
+}
