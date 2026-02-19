@@ -1,42 +1,11 @@
 <script lang="ts">
 	import Card from '$lib/components/Card.svelte';
 	import PublicProfile from '$lib/components/PublicProfile.svelte';
+	import { getProfile } from '$lib/remote/profile.remote';
 
-	// TODO: fetch profile from API
-	const profile = {
-		id: 1,
-		user_id: 1,
-		first_name: 'John',
-		last_name: 'Doe',
-		email: 'john.doe@example.com',
-		avatar_url: 'https://picsum.photos/id/40/100/100',
-		links: [
-			{
-				id: 1,
-				profile_id: 1,
-				platform_id: 1,
-				url: 'https://example.com',
-				platform: {
-					id: 1,
-					name: 'Github',
-					icon: 'github',
-					color: '#000000'
-				}
-			},
-			{
-				id: 2,
-				profile_id: 1,
-				platform_id: 2,
-				url: 'https://example.com',
-				platform: {
-					id: 2,
-					name: 'Twitter',
-					icon: 'social_x',
-					color: '#000000'
-				}
-			}
-		]
-	};
+	// TODO: replace it with the actual profile ID
+	const profileID = '7';
+	const profile = await getProfile(profileID);
 </script>
 
 <Card shadow={true}>

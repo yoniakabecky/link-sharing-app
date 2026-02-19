@@ -1,13 +1,18 @@
 <script lang="ts">
+	import { getContext } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import Mockup from '$lib/components/Mockup.svelte';
+	import { getLinks } from '$lib/remote/link.remote';
 	import LinksForm from './LinksForm.svelte';
+
+	const profileID = getContext('profileID') as string;
+	const links = await getLinks(profileID);
 </script>
 
 <div class="desktop-only">
 	<Card style="block-size: 100%;">
-		<Mockup showSkeleton={true} />
+		<Mockup showSkeleton={true} {links} />
 	</Card>
 </div>
 
@@ -19,7 +24,7 @@
 		</p>
 	{/snippet}
 
-	<LinksForm />
+	<LinksForm {links} />
 
 	{#snippet footer()}
 		<Button>Save</Button>

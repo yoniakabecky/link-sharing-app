@@ -1,37 +1,18 @@
 <script lang="ts">
+	import { getContext } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import Mockup from '$lib/components/Mockup.svelte';
-	import type { Link } from '$lib/models/link';
-	import type { Profile } from '$lib/models/profile';
+	import { getProfile } from '$lib/remote/profile.remote';
 	import ProfileForm from './ProfileForm.svelte';
 
-	const dummyProfile = {
-		id: 1,
-		user_id: 1,
-		first_name: 'John',
-		last_name: 'Doe',
-		email: 'john.doe@example.com',
-		avatar_url: 'https://picsum.photos/id/40/100/100'
-	} as Profile;
-
-	const dummyLinks = [
-		{
-			id: 1,
-			url: 'https://example.com',
-			platform: {
-				id: 1,
-				name: 'Github',
-				icon: 'github',
-				color: '#000000'
-			}
-		}
-	] as Link[];
+	const profileID = getContext('profileID') as string;
+	const profile = await getProfile(profileID);
 </script>
 
 <div class="desktop-only">
 	<Card style="block-size: 100%;">
-		<Mockup profile={dummyProfile} links={dummyLinks} />
+		<Mockup {profile} links={profile.links} />
 	</Card>
 </div>
 
@@ -41,7 +22,7 @@
 		<p class="description">Add your details to create a personal touch to your profile.</p>
 	{/snippet}
 
-	<ProfileForm profile={dummyProfile} />
+	<ProfileForm {profile} />
 
 	{#snippet footer()}
 		<div class="end">

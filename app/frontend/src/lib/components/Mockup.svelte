@@ -6,11 +6,13 @@
 
 	type Props = {
 		profile?: Profile;
-		links?: Partial<Link>[];
+		links?: Link[];
 		showSkeleton?: boolean;
 	};
 	let { profile, links, showSkeleton }: Props = $props();
+
 	const maxDisplayLinks = 5;
+	const numOfSkeletonLinks = $derived(maxDisplayLinks - (links?.length ?? 0));
 </script>
 
 {#snippet displayProfile(p: Profile)}
@@ -48,8 +50,9 @@
 						<PlatformButton link={link as Link} size="sm" />
 					</div>
 				{/each}
-			{:else if showSkeleton && (links ?? []).length < maxDisplayLinks}
-				{#each Array(maxDisplayLinks - (links ?? []).length) as _}
+			{/if}
+			{#if showSkeleton && numOfSkeletonLinks > 0}
+				{#each Array(numOfSkeletonLinks) as _}
 					<div class="link skeleton"></div>
 				{/each}
 			{/if}

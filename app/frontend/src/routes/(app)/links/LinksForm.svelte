@@ -1,31 +1,37 @@
 <script lang="ts">
 	import Button from '$lib/components/Button.svelte';
-	import Icon from '$lib/components/Icon.svelte';
+	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import Select from '$lib/components/Select.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
-
-	// TODO: get platforms from API
-	const platforms = [
-		{ label: 'Github', value: 'github' },
-		{ label: 'Twitter', value: 'twitter' },
-		{ label: 'LinkedIn', value: 'linkedin' },
-		{ label: 'Instagram', value: 'instagram' },
-		{ label: 'Facebook', value: 'facebook' }
-	];
+	import type { Link } from '$lib/models/link';
+	import { getPlatforms } from '$lib/remote/platform.remote';
 
 	const defaultLink = {
 		url: '',
 		platform_id: ''
 	};
 
-	// TODO: get links from API, if links is empty add a empty link object
-	let links = $state([defaultLink]);
+	let { links } = $props();
+	const platforms = await getPlatforms();
+	const platformOptions = $derived(
+		platforms.map((platform) => ({
+			label: platform.name,
+			value: platform.id.toString(),
+			icon: platform.icon as IconName
+		}))
+	);
+
+	$effect(() => {
+		if (links.length === 0) {
+			links = [defaultLink];
+		}
+	});
 
 	const onAddLink = () => {
 		links.push(defaultLink);
 	};
 	const onRemoveLink = (index: number) => {
-		links = links.filter((_, i) => index !== i);
+		links = links.filter((_: Link, i: number) => index !== i);
 	};
 </script>
 
@@ -50,7 +56,7 @@
 				<Select
 					label="Platform"
 					placeholder="Select a platform"
-					options={platforms}
+					options={platformOptions}
 					value={link.platform_id}
 				/>
 			</div>

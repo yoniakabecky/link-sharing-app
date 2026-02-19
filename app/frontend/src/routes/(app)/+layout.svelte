@@ -1,7 +1,12 @@
 <script lang="ts">
+	import { setContext } from 'svelte';
 	import Header from './Header.svelte';
 
 	let { children } = $props();
+
+	// TODO: fetch profile ID from API
+	const profileID = '7';
+	setContext('profileID', profileID);
 </script>
 
 <div class="app">
