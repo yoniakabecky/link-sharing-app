@@ -12,7 +12,7 @@
 
 <div class="desktop-only">
 	<Card style="block-size: 100%;">
-		<Mockup {profile} links={profile.links} />
+		<Mockup {profile} />
 	</Card>
 </div>
 

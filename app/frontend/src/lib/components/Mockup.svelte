@@ -6,16 +6,15 @@
 
 	type Props = {
 		profile?: Profile;
-		links?: Link[];
-		showSkeleton?: boolean;
+		links?: Partial<Link>[];
 	};
-	let { profile, links, showSkeleton }: Props = $props();
+	let { profile, links }: Props = $props();
 
 	const maxDisplayLinks = 5;
 	const numOfSkeletonLinks = $derived(maxDisplayLinks - (links?.length ?? 0));
 </script>
 
-{#snippet displayProfile(p: Profile)}
+{#snippet profileDisplay(p: Profile)}
 	<div class="profile">
 		<div class="avatar">
 			<img src={p.avatar_url} alt="Avatar" />
@@ -38,25 +37,34 @@
 		<img src={mock} alt="Mobile Mockup" />
 	</div>
 	<div class="content">
-		{#if !profile || showSkeleton}
-			{@render profileSkeleton()}
-		{:else}
-			{@render displayProfile(profile)}
-		{/if}
-		<div class="links">
-			{#if links && links.length > 0}
-				{#each links as link}
+		{#if profile}
+			{@render profileDisplay(profile)}
+
+			<div class="links">
+				{#each profile.links as link}
 					<div class="link">
-						<PlatformButton link={link as Link} size="sm" />
+						<PlatformButton {link} size="sm" />
 					</div>
 				{/each}
-			{/if}
-			{#if showSkeleton && numOfSkeletonLinks > 0}
-				{#each Array(numOfSkeletonLinks) as _}
-					<div class="link skeleton"></div>
-				{/each}
-			{/if}
-		</div>
+			</div>
+		{:else}
+			{@render profileSkeleton()}
+
+			<div class="links">
+				{#if links && links.length > 0}
+					{#each links as link}
+						<div class="link">
+							<PlatformButton link={link as Link} size="sm" />
+						</div>
+					{/each}
+				{/if}
+				{#if numOfSkeletonLinks > 0}
+					{#each Array(numOfSkeletonLinks) as _}
+						<div class="link skeleton"></div>
+					{/each}
+				{/if}
+			</div>
+		{/if}
 	</div>
 </div>
 
