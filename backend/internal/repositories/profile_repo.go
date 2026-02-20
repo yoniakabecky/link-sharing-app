@@ -80,33 +80,9 @@ func (r *ProfileRepository) GetProfileByID(ctx context.Context, id int) (*models
 
 func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile) (*models.Profile, error) {
 	err := r.execTx(ctx, func(tx *sqlx.Tx) error {
-		p, err := updateProfile(ctx, tx, p)
+		_, err := tx.NamedExecContext(ctx, "UPDATE profiles SET first_name = :first_name, last_name = :last_name, email = :email, avatar_url = :avatar_url WHERE id = :id", p)
 		if err != nil {
 			return fmt.Errorf("error updating profile: %w", err)
-		}
-
-		linkIDs := make(map[int]struct{}, len(p.Links))
-		for _, l := range p.Links {
-			linkIDs[l.ID] = struct{}{}
-		}
-
-		cls, err := r.lRepo.GetLinksByProfileIDTx(ctx, tx, p.ID)
-		if err != nil {
-			return fmt.Errorf("error updating profile: %w", err)
-		}
-
-		for _, l := range cls {
-			if _, keep := linkIDs[l.ID]; !keep {
-				if err := r.lRepo.DeleteLinkByIDTx(ctx, tx, l.ID); err != nil {
-					return fmt.Errorf("error updating profile: %w", err)
-				}
-			}
-		}
-		for i := range p.Links {
-			p.Links[i].ProfileID = p.ID
-			if err := r.lRepo.UpdateLinkTx(ctx, tx, &p.Links[i]); err != nil {
-				return fmt.Errorf("error updating profile: %w", err)
-			}
 		}
 		return nil
 	})
@@ -119,14 +95,6 @@ func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile
 		return nil, fmt.Errorf("error updating profile: %w", err)
 	}
 	return up, nil
-}
-
-func updateProfile(ctx context.Context, tx *sqlx.Tx, p *models.Profile) (*models.Profile, error) {
-	_, err := tx.NamedExecContext(ctx, "UPDATE profiles SET first_name = :first_name, last_name = :last_name, email = :email, avatar_url = :avatar_url WHERE id = :id", p)
-	if err != nil {
-		return nil, fmt.Errorf("error updating profile: %w", err)
-	}
-	return p, nil
 }
 
 func (r *ProfileRepository) DeleteProfile(ctx context.Context, id int) error {
