@@ -37,7 +37,7 @@
 {/snippet}
 
 {#snippet PreviewNav()}
-	<Button variant="outlined" href="/links">
+	<Button variant="outlined" onclick={() => history.back()}>
 		<Icon name="arrow_left" size={20} class="mobile-only" />
 		<span class="desktop-only">Back to Editor</span>
 	</Button>
