@@ -1,18 +1,46 @@
 <script lang="ts">
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import Mockup from '$lib/components/Mockup.svelte';
-	import { getLinks } from '$lib/remote/link.remote';
+	import { defaultLink } from '$lib/constants/default-link';
+	import type { Link } from '$lib/models/link';
+	import { getLinks, updateLinks } from '$lib/remote/link.remote';
+	import { getPlatforms } from '$lib/remote/platform.remote';
 	import LinksForm from './LinksForm.svelte';
 
 	const profileID = getContext('profileID') as string;
 	const links = await getLinks(profileID);
+	const platforms = await getPlatforms();
+
+	onMount(() => {
+		if (links.length === 0) {
+			updateLinks.fields.links.set([defaultLink]);
+		} else {
+			for (let i = 0; i < links.length; i++) {
+				updateLinks.fields.links[i].set({
+					id: String(links[i].id),
+					platform_id: String(links[i].platform_id),
+					url: links[i].url
+				});
+			}
+		}
+	});
+
+	const displayLinks = $derived.by(() => {
+		const formValues = updateLinks.fields.links.value() ?? [];
+		return formValues
+			.map((link) => ({
+				...link,
+				platform: platforms.find((p) => p.id === Number(link.platform_id))
+			}))
+			.filter((link) => link.platform);
+	}) as unknown as Partial<Link>[];
 </script>
 
 <div class="desktop-only">
 	<Card style="block-size: 100%;">
-		<Mockup {links} />
+		<Mockup links={displayLinks} />
 	</Card>
 </div>
 
@@ -24,10 +52,10 @@
 		</p>
 	{/snippet}
 
-	<LinksForm {links} />
+	<LinksForm {updateLinks} {platforms} />
 
 	{#snippet footer()}
-		<Button>Save</Button>
+		<Button type="submit" form="links-form">Save</Button>
 	{/snippet}
 </Card>
 

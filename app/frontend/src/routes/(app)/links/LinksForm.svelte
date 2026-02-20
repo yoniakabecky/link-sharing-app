@@ -1,18 +1,19 @@
 <script lang="ts">
+	import type { RemoteForm } from '@sveltejs/kit';
 	import Button from '$lib/components/Button.svelte';
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import Select from '$lib/components/Select.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
-	import type { Link } from '$lib/models/link';
-	import { getPlatforms } from '$lib/remote/platform.remote';
+	import { defaultLink } from '$lib/constants/default-link';
+	import type { UpdateLinks } from '$lib/models/link';
+	import type { Platform } from '$lib/models/platform';
 
-	const defaultLink = {
-		url: '',
-		platform_id: ''
+	type Props = {
+		updateLinks: RemoteForm<UpdateLinks, void>;
+		platforms: Platform[];
 	};
+	let { updateLinks, platforms }: Props = $props();
 
-	let { links } = $props();
-	const platforms = await getPlatforms();
 	const platformOptions = $derived(
 		platforms.map((platform) => ({
 			label: platform.name,
@@ -21,26 +22,28 @@
 		}))
 	);
 
-	$effect(() => {
-		if (links.length === 0) {
-			links = [defaultLink];
-		}
-	});
-
 	const onAddLink = () => {
-		links.push(defaultLink);
+		const currentLength = updateLinks.fields.links.value().length;
+		updateLinks.fields.links[currentLength].set(defaultLink);
 	};
+
 	const onRemoveLink = (index: number) => {
-		links = links.filter((_: Link, i: number) => index !== i);
+		const newLinks = updateLinks.fields.links.value().filter((_: any, i: number) => index !== i);
+		updateLinks.fields.links.set(newLinks);
 	};
 </script>
 
-<form id="links-form">
+<form
+	id="links-form"
+	{...updateLinks.enhance(async ({ submit }) => {
+		await submit();
+	})}
+>
 	<Button type="button" variant="outlined" class="full-width" onclick={onAddLink}>
 		+ Add new link
 	</Button>
 
-	{#each links as link, index}
+	{#each updateLinks.fields.links.value() as _, index}
 		<fieldset>
 			<div class="link-header">
 				<div class="link-header-title">
@@ -49,19 +52,27 @@
 					</span>
 					<legend>Link #{index + 1}</legend>
 				</div>
-				<button class="remove-link" onclick={() => onRemoveLink(index)}>Remove</button>
+				<button class="remove-link" type="button" onclick={() => onRemoveLink(index)}>Remove</button
+				>
 			</div>
+
+			<input type="hidden" {...updateLinks.fields.links[index].id.as('text')} />
 
 			<div>
 				<Select
 					label="Platform"
 					placeholder="Select a platform"
 					options={platformOptions}
-					value={link.platform_id}
+					{...updateLinks.fields.links[index].platform_id.as('select')}
 				/>
 			</div>
 			<div>
-				<TextInput label="URL" placeholder="Enter your URL" leftIcon="link" value={link.url} />
+				<TextInput
+					label="URL"
+					placeholder="Enter your URL"
+					leftIcon="link"
+					{...updateLinks.fields.links[index].url.as('text')}
+				/>
 			</div>
 		</fieldset>
 	{/each}
