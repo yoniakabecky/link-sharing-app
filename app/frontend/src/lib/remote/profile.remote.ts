@@ -1,8 +1,8 @@
 import * as v from 'valibot';
 import { error } from '@sveltejs/kit';
-import { query } from '$app/server';
+import { form, query } from '$app/server';
 import { API_BASE_URL } from '$env/static/private';
-import type { Profile } from '$lib/models/profile';
+import { updateProfileSchema, type Profile } from '$lib/models/profile';
 
 export const getProfile = query(v.string(), async (profileID) => {
 	const response = await fetch(`${API_BASE_URL}/profiles/${profileID}`);
@@ -12,4 +12,21 @@ export const getProfile = query(v.string(), async (profileID) => {
 	const data = await response.json();
 
 	return data as Profile;
+});
+
+export const updateProfile = form(updateProfileSchema, async (profile) => {
+	try {
+		// TODO: replace profileId with the actual profile ID
+		const profileId = '7';
+		const response = await fetch(`${API_BASE_URL}/profiles/${profileId}`, {
+			method: 'PUT',
+			body: JSON.stringify(profile)
+		});
+		if (!response.ok) {
+			error(response.status, `Error updating profile: ${response.statusText}`);
+		}
+	} catch (err) {
+		console.error(err);
+		error(500, `Error updating links: ${err instanceof Error ? err.message : 'Unknown error'}`);
+	}
 });

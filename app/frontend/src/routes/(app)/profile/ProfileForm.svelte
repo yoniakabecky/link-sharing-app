@@ -1,19 +1,41 @@
 <script lang="ts">
 	import Icon from '$lib/components/Icon.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
+	import type { UpdateProfile } from '$lib/models/profile';
+	import type { RemoteForm } from '@sveltejs/kit';
 
-	let { profile } = $props();
+	type Props = {
+		updateProfile: RemoteForm<UpdateProfile, void>;
+	};
+
+	let { updateProfile }: Props = $props();
 </script>
 
-<form id="profile-form">
+<form
+	id="profile-form"
+	enctype="multipart/form-data"
+	{...updateProfile.enhance(async ({ submit }) => {
+		await submit();
+	})}
+>
 	<div class="profile-picture">
 		<label for="profile-picture-input">Profile Picture</label>
 
 		<div class="profile-picture-wrapper">
-			{#if profile.avatar_url}
-				<img class="profile-picture-img" src={profile.avatar_url} alt="Your profile" />
+			{#if updateProfile.fields.avatar_url.value()}
+				<img
+					class="profile-picture-img"
+					src={updateProfile.fields.avatar_url.value()}
+					alt="Your profile"
+				/>
+				<input type="hidden" {...updateProfile.fields.avatar_url.as('text')} />
 			{/if}
-			<input type="file" id="profile-picture-input" name="profile-picture" accept="image/*" />
+			<!-- TODO: handle file select / upload -->
+			<input
+				id="profile-picture-input"
+				accept="image/*"
+				{...updateProfile.fields.avatar.as('file')}
+			/>
 			<div class="profile-picture-overlay">
 				<Icon name="pic_line" size={32} />
 				<div>Change Image</div>
@@ -27,15 +49,15 @@
 	<div class="profile-details">
 		<div class="profile-details-item">
 			<label for="first-name">First name*</label>
-			<TextInput id="first-name" name="first-name" value={profile.first_name} />
+			<TextInput id="first-name" {...updateProfile.fields.first_name.as('text')} />
 		</div>
 		<div class="profile-details-item">
 			<label for="last-name">Last name*</label>
-			<TextInput id="last-name" name="last-name" value={profile.last_name} />
+			<TextInput id="last-name" {...updateProfile.fields.last_name.as('text')} />
 		</div>
 		<div class="profile-details-item">
 			<label for="email">Email</label>
-			<TextInput id="email" name="email" value={profile.email} />
+			<TextInput id="email" {...updateProfile.fields.email.as('email')} />
 		</div>
 	</div>
 </form>

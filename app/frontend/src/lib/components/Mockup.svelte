@@ -5,7 +5,7 @@
 	import PlatformButton from './PlatformButton.svelte';
 
 	type Props = {
-		profile?: Profile;
+		profile?: Partial<Profile>;
 		links?: Partial<Link>[];
 	};
 	let { profile, links }: Props = $props();
@@ -14,7 +14,7 @@
 	const numOfSkeletonLinks = $derived(maxDisplayLinks - (links?.length ?? 0));
 </script>
 
-{#snippet profileDisplay(p: Profile)}
+{#snippet profileDisplay(p: Partial<Profile>)}
 	<div class="profile">
 		<div class="avatar">
 			<img src={p.avatar_url} alt="Avatar" />
