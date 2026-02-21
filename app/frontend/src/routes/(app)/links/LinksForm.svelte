@@ -65,6 +65,9 @@
 					options={platformOptions}
 					{...updateLinks.fields.links[index].platform_id.as('select')}
 				/>
+				{#each updateLinks.fields.links[index].platform_id.issues() as issue}
+					<small class="issue">{issue.message}</small>
+				{/each}
 			</div>
 			<div>
 				<TextInput
@@ -73,6 +76,9 @@
 					leftIcon="link"
 					{...updateLinks.fields.links[index].url.as('text')}
 				/>
+				{#each updateLinks.fields.links[index].url.issues() as issue}
+					<small class="issue">{issue.message}</small>
+				{/each}
 			</div>
 		</fieldset>
 	{/each}
@@ -133,5 +139,10 @@
 	}
 	.remove-link:hover {
 		text-decoration: underline;
+	}
+
+	.issue {
+		margin-block-start: var(--spacing-1);
+		color: var(--color-error-red);
 	}
 </style>

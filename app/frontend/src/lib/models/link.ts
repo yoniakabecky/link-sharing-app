@@ -13,7 +13,7 @@ export type Link = {
 
 const updateLinkSchema = v.object({
 	id: v.optional(v.string()),
-	platform_id: v.string(),
+	platform_id: v.pipe(v.string(), v.nonEmpty('Please select a platform.')),
 	url: v.pipe(
 		v.string(),
 		v.nonEmpty('Please enter your url.'),

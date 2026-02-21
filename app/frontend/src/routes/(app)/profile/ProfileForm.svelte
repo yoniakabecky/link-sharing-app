@@ -14,6 +14,7 @@
 <form
 	id="profile-form"
 	enctype="multipart/form-data"
+	novalidate
 	{...updateProfile.enhance(async ({ submit }) => {
 		await submit();
 	})}
@@ -50,14 +51,26 @@
 		<div class="profile-details-item">
 			<label for="first-name">First name*</label>
 			<TextInput id="first-name" {...updateProfile.fields.first_name.as('text')} />
+			{#each updateProfile.fields.first_name.issues() as issue}
+				<span></span>
+				<small class="issue">{issue.message}</small>
+			{/each}
 		</div>
 		<div class="profile-details-item">
 			<label for="last-name">Last name*</label>
 			<TextInput id="last-name" {...updateProfile.fields.last_name.as('text')} />
+			{#each updateProfile.fields.last_name.issues() as issue}
+				<span></span>
+				<small class="issue">{issue.message}</small>
+			{/each}
 		</div>
 		<div class="profile-details-item">
 			<label for="email">Email</label>
 			<TextInput id="email" {...updateProfile.fields.email.as('email')} />
+			{#each updateProfile.fields.email.issues() as issue}
+				<span></span>
+				<small class="issue">{issue.message}</small>
+			{/each}
 		</div>
 	</div>
 </form>
@@ -139,5 +152,10 @@
 		display: grid;
 		grid-template-columns: 30% 1fr;
 		align-items: center;
+	}
+
+	.issue {
+		margin-block-start: var(--spacing-1);
+		color: var(--color-error-red);
 	}
 </style>
