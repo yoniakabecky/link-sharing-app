@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { RemoteForm } from '@sveltejs/kit';
+	import { toast } from 'svelte-sonner';
 	import Button from '$lib/components/Button.svelte';
 	import Icon, { type IconName } from '$lib/components/Icon.svelte';
 	import Select from '$lib/components/Select.svelte';
@@ -9,7 +10,7 @@
 	import type { Platform } from '$lib/models/platform';
 
 	type Props = {
-		updateLinks: RemoteForm<UpdateLinks, void>;
+		updateLinks: RemoteForm<UpdateLinks, { success: boolean }>;
 		platforms: Platform[];
 	};
 	let { updateLinks, platforms }: Props = $props();
@@ -36,7 +37,17 @@
 <form
 	id="links-form"
 	{...updateLinks.enhance(async ({ submit }) => {
-		await submit();
+		try {
+			await submit();
+			if (updateLinks.result?.success) {
+				toast.success('Links updated successfully!');
+			} else {
+				toast.warning('Please check the fields and try again...');
+			}
+		} catch (error) {
+			console.error(error);
+			toast.error('Failed to update links.');
+		}
 	})}
 >
 	<Button type="button" variant="outlined" class="full-width" onclick={onAddLink}>

@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import { error } from '@sveltejs/kit';
+import { error, invalid } from '@sveltejs/kit';
 import { form, query } from '$app/server';
 import { API_BASE_URL } from '$env/static/private';
 import { updateProfileSchema, type Profile } from '$lib/models/profile';
@@ -23,8 +23,9 @@ export const updateProfile = form(updateProfileSchema, async (profile) => {
 			body: JSON.stringify(profile)
 		});
 		if (!response.ok) {
-			error(response.status, `Error updating profile: ${response.statusText}`);
+			invalid(`Error updating profile: ${response.statusText}`);
 		}
+		return { success: true };
 	} catch (err) {
 		console.error(err);
 		error(500, `Error updating links: ${err instanceof Error ? err.message : 'Unknown error'}`);

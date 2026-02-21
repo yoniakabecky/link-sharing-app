@@ -1,11 +1,12 @@
 <script lang="ts">
+	import { toast } from 'svelte-sonner';
 	import Icon from '$lib/components/Icon.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import type { UpdateProfile } from '$lib/models/profile';
 	import type { RemoteForm } from '@sveltejs/kit';
 
 	type Props = {
-		updateProfile: RemoteForm<UpdateProfile, void>;
+		updateProfile: RemoteForm<UpdateProfile, { success: boolean }>;
 	};
 
 	let { updateProfile }: Props = $props();
@@ -16,7 +17,17 @@
 	enctype="multipart/form-data"
 	novalidate
 	{...updateProfile.enhance(async ({ submit }) => {
-		await submit();
+		try {
+			await submit();
+			if (updateProfile.result?.success) {
+				toast.success('Profile updated successfully!');
+			} else {
+				toast.warning('Please check the fields and try again...');
+			}
+		} catch (error) {
+			console.error(error);
+			toast.error('Failed to update profile.');
+		}
 	})}
 >
 	<div class="profile-picture">
