@@ -3,9 +3,18 @@
 	import logo from '$lib/assets/logo.svg';
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import { toast } from 'svelte-sonner';
 
 	let isPreview = $derived(page.url.pathname === '/preview');
 	let pathname = $derived(page.url.pathname);
+
+	// TODO: replace profileID with the actual profile ID
+	const profileID = '7';
+	const copyUrl = () => {
+		const url = `${window.location.origin}/shared?id=${profileID}`;
+		navigator.clipboard.writeText(url);
+		toast.success('Link copied to clipboard');
+	};
 </script>
 
 {#snippet MainNav()}
@@ -41,7 +50,7 @@
 		<Icon name="arrow_left" size={20} class="mobile-only" />
 		<span class="desktop-only">Back to Editor</span>
 	</Button>
-	<Button href="/">Share Link</Button>
+	<Button onclick={() => copyUrl()}>Share Link</Button>
 {/snippet}
 
 <header>

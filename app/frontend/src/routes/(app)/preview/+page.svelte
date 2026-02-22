@@ -11,6 +11,3 @@
 <Card shadow={true}>
 	<PublicProfile {profile} />
 </Card>
-
-<style>
-</style>
