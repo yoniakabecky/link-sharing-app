@@ -6,6 +6,7 @@ export type Link = {
 	profile_id: number;
 	platform_id: number;
 	url: string;
+	position: number;
 	created_at: string;
 	updated_at: string;
 	platform: Platform;
@@ -18,7 +19,8 @@ const updateLinkSchema = v.object({
 		v.string(),
 		v.nonEmpty('Please enter your url.'),
 		v.url('The url is badly formatted.')
-	)
+	),
+	position: v.number()
 });
 
 export const updateLinksSchema = v.object({

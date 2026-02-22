@@ -25,7 +25,10 @@
 
 	const onAddLink = () => {
 		const currentLength = updateLinks.fields.links.value().length;
-		updateLinks.fields.links[currentLength].set(defaultLink);
+		updateLinks.fields.links[currentLength].set({
+			...defaultLink,
+			position: currentLength
+		});
 	};
 
 	const onRemoveLink = (index: number) => {
@@ -67,7 +70,8 @@
 				>
 			</div>
 
-			<input type="hidden" {...updateLinks.fields.links[index].id.as('text')} />
+			<input {...updateLinks.fields.links[index].id.as('text')} type="hidden" />
+			<input {...updateLinks.fields.links[index].position.as('number')} type="hidden" />
 
 			<div>
 				<Select
