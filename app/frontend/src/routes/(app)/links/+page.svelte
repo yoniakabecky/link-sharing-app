@@ -62,10 +62,18 @@
 <style>
 	.heading {
 		margin-block-end: var(--spacing-2);
+		font-size: var(--font-size-xl);
 	}
 	.description {
 		margin: 0;
 		font-size: var(--font-size-sm);
 		color: var(--color-text-secondary);
+	}
+
+	@media (max-width: 480px) {
+		.heading {
+			margin-block-start: 0;
+			font-size: var(--font-size-lg);
+		}
 	}
 </style>

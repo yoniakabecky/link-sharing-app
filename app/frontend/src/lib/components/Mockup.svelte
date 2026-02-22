@@ -77,7 +77,6 @@
 		block-size: 100%;
 		inline-size: 100%;
 		min-block-size: 540px;
-		min-inline-size: 280px;
 	}
 
 	.mobile-mockup {

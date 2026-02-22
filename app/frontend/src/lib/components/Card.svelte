@@ -35,6 +35,7 @@
 		flex-direction: column;
 		background-color: var(--color-card);
 		border-radius: var(--radius-md);
+		overflow: auto;
 	}
 
 	.card header,
@@ -72,5 +73,13 @@
 
 	.card[data-shadow='true'] {
 		box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+	}
+
+	@media (max-width: 480px) {
+		.card header,
+		.card main,
+		.card footer {
+			padding-inline: var(--spacing-5);
+		}
 	}
 </style>

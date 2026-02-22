@@ -57,7 +57,7 @@
 
 	.name {
 		margin-block-start: var(--spacing-7);
-		font-size: var(--font-size-xl);
+		font-size: var(--font-size-2xl);
 		font-weight: 700;
 	}
 

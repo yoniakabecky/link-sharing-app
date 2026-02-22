@@ -169,4 +169,18 @@
 		margin-block-start: var(--spacing-1);
 		color: var(--color-error-red);
 	}
+
+	@media (max-width: 768px) {
+		.profile-picture {
+			grid-template-columns: 1fr;
+			gap: var(--spacing-2);
+		}
+		.profile-details-item {
+			grid-template-columns: 1fr;
+		}
+
+		.profile-details-item label {
+			margin-block-end: var(--spacing-1);
+		}
+	}
 </style>
