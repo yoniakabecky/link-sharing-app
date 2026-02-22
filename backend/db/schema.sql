@@ -20,6 +20,7 @@ CREATE TABLE `links` (
   `profile_id` int NOT NULL,
   `platform_id` int NOT NULL,
   `url` varchar(255) NOT NULL,
+  `position` int NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
@@ -117,5 +118,6 @@ CREATE TABLE `users` (
 LOCK TABLES `schema_migrations` WRITE;
 INSERT INTO `schema_migrations` (version) VALUES
   ('20260129134153'),
-  ('20260130122009');
+  ('20260130122009'),
+  ('20260222130905');
 UNLOCK TABLES;

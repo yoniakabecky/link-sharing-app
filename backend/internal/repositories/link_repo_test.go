@@ -30,9 +30,9 @@ func TestGetLinksByProfileID(t *testing.T) {
 			name: "success",
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
 				now := time.Now()
-				rows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
-					AddRow(1, 1, 1, "https://example.com", now, nil).
-					AddRow(2, 1, 2, "https://example.org", now, nil)
+				rows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}).
+					AddRow(1, 1, 1, "https://example.com", 0, now, nil).
+					AddRow(2, 1, 2, "https://example.org", 1, now, nil)
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(rows)
 				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
@@ -53,7 +53,7 @@ func TestGetLinksByProfileID(t *testing.T) {
 		{
 			name: "success empty",
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
-				rows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"})
+				rows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"})
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(rows)
 
 				links, err := repo.GetLinksByProfileID(context.Background(), 1)
@@ -99,8 +99,8 @@ func TestGetLinksByProfileIDTx(t *testing.T) {
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				now := time.Now()
-				rows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
-					AddRow(1, 1, 1, "https://example.com", now, nil)
+				rows := sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}).
+					AddRow(1, 1, 1, "https://example.com", 0, now, nil)
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).WillReturnRows(rows)
 				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
@@ -161,8 +161,8 @@ func TestCreateLinkTx(t *testing.T) {
 			name: "success",
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url) VALUES (?, ?, ?)").
-					WithArgs(1, 1, "https://example.com").
+				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url, position) VALUES (?, ?, ?, ?)").
+					WithArgs(1, 1, "https://example.com", 0).
 					WillReturnResult(sqlmock.NewResult(5, 1))
 				mock.ExpectCommit()
 
@@ -182,8 +182,8 @@ func TestCreateLinkTx(t *testing.T) {
 			name: "error inserting link",
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url) VALUES (?, ?, ?)").
-					WithArgs(1, 1, "https://example.com").
+				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url, position) VALUES (?, ?, ?, ?)").
+					WithArgs(1, 1, "https://example.com", 0).
 					WillReturnError(errors.New("insert failed"))
 				mock.ExpectRollback()
 
@@ -204,8 +204,8 @@ func TestCreateLinkTx(t *testing.T) {
 			name: "error getting last insert ID",
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url) VALUES (?, ?, ?)").
-					WithArgs(1, 1, "https://example.com").
+				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url, position) VALUES (?, ?, ?, ?)").
+					WithArgs(1, 1, "https://example.com", 0).
 					WillReturnResult(sqlmock.NewErrorResult(errors.New("last insert id failed")))
 				mock.ExpectRollback()
 
@@ -243,8 +243,8 @@ func TestUpdateLinkTx(t *testing.T) {
 			name: "success update existing",
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").
-					WithArgs(2, "https://example.com/updated", 1).
+				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ?, position = ? WHERE id = ?").
+					WithArgs(2, "https://example.com/updated", 0, 1).
 					WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit()
 
@@ -263,8 +263,8 @@ func TestUpdateLinkTx(t *testing.T) {
 			name: "success create when ID is zero",
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url) VALUES (?, ?, ?)").
-					WithArgs(1, 2, "https://example.com/new").
+				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url, position) VALUES (?, ?, ?, ?)").
+					WithArgs(1, 2, "https://example.com/new", 0).
 					WillReturnResult(sqlmock.NewResult(10, 1))
 				mock.ExpectCommit()
 
@@ -284,8 +284,8 @@ func TestUpdateLinkTx(t *testing.T) {
 			name: "error updating link",
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
-				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").
-					WithArgs(2, "https://example.com/updated", 1).
+				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ?, position = ? WHERE id = ?").
+					WithArgs(2, "https://example.com/updated", 0, 1).
 					WillReturnError(errors.New("update failed"))
 				mock.ExpectRollback()
 
@@ -381,9 +381,9 @@ func TestUpdateLinks(t *testing.T) {
 				}
 				mock.ExpectBegin()
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).
-					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}))
-				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url) VALUES (?, ?, ?)").
-					WithArgs(1, 1, "https://example.com/new").
+					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}))
+				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url, position) VALUES (?, ?, ?, ?)").
+					WithArgs(1, 1, "https://example.com/new", 0).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 
@@ -402,12 +402,12 @@ func TestUpdateLinks(t *testing.T) {
 				}
 				mock.ExpectBegin()
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).
-					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
-						AddRow(1, 1, 1, "https://example.com", now, nil))
+					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}).
+						AddRow(1, 1, 1, "https://example.com", 0, now, nil))
 				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
-				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").
-					WithArgs(1, "https://example.com/updated", 1).
+				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ?, position = ? WHERE id = ?").
+					WithArgs(1, "https://example.com/updated", 0, 1).
 					WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit()
 
@@ -425,16 +425,16 @@ func TestUpdateLinks(t *testing.T) {
 				}
 				mock.ExpectBegin()
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).
-					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
-						AddRow(1, 1, 1, "https://example.com", now, nil).
-						AddRow(2, 1, 2, "https://example.org", now, nil))
+					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}).
+						AddRow(1, 1, 1, "https://example.com", 0, now, nil).
+						AddRow(2, 1, 2, "https://example.org", 1, now, nil))
 				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
 				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(2).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(2, "Facebook", "facebook", "#000000"))
 				mock.ExpectExec("DELETE FROM links WHERE id = ?").WithArgs(2).WillReturnResult(sqlmock.NewResult(0, 1))
-				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").
-					WithArgs(1, "https://example.com", 1).
+				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ?, position = ? WHERE id = ?").
+					WithArgs(1, "https://example.com", 0, 1).
 					WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit()
 
@@ -449,7 +449,7 @@ func TestUpdateLinks(t *testing.T) {
 			test: func(t *testing.T, repo *LinkRepository, mock sqlmock.Sqlmock) {
 				mock.ExpectBegin()
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).
-					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}))
+					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}))
 				mock.ExpectCommit()
 
 				err := repo.UpdateLinks(context.Background(), 1, []models.Link{})
@@ -491,9 +491,9 @@ func TestUpdateLinks(t *testing.T) {
 				links := []models.Link{{ID: 1, ProfileID: 1, PlatformID: 1, URL: "https://example.com"}}
 				mock.ExpectBegin()
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).
-					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
-						AddRow(1, 1, 1, "https://example.com", now, nil).
-						AddRow(2, 1, 2, "https://example.org", now, nil))
+					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}).
+						AddRow(1, 1, 1, "https://example.com", 0, now, nil).
+						AddRow(2, 1, 2, "https://example.org", 1, now, nil))
 				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
 				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(2).WillReturnRows(
@@ -514,12 +514,12 @@ func TestUpdateLinks(t *testing.T) {
 				links := []models.Link{{ID: 1, ProfileID: 1, PlatformID: 1, URL: "https://example.com"}}
 				mock.ExpectBegin()
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).
-					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
-						AddRow(1, 1, 1, "https://example.com", now, nil))
+					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}).
+						AddRow(1, 1, 1, "https://example.com", 0, now, nil))
 				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
-				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").
-					WithArgs(1, "https://example.com", 1).
+				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ?, position = ? WHERE id = ?").
+					WithArgs(1, "https://example.com", 0, 1).
 					WillReturnError(errors.New("update failed"))
 				mock.ExpectRollback()
 
@@ -536,12 +536,12 @@ func TestUpdateLinks(t *testing.T) {
 				links := []models.Link{{ID: 1, ProfileID: 1, PlatformID: 1, URL: "https://example.com"}}
 				mock.ExpectBegin()
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(1).
-					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}).
-						AddRow(1, 1, 1, "https://example.com", now, nil))
+					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}).
+						AddRow(1, 1, 1, "https://example.com", 0, now, nil))
 				mock.ExpectQuery("SELECT * FROM platforms WHERE id = ?").WithArgs(1).WillReturnRows(
 					sqlmock.NewRows([]string{"id", "name", "icon", "color"}).AddRow(1, "Twitter", "twitter", "#000000"))
-				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ? WHERE id = ?").
-					WithArgs(1, "https://example.com", 1).
+				mock.ExpectExec("UPDATE links SET platform_id = ?, url = ?, position = ? WHERE id = ?").
+					WithArgs(1, "https://example.com", 0, 1).
 					WillReturnResult(sqlmock.NewResult(0, 1))
 				mock.ExpectCommit().WillReturnError(errors.New("commit failed"))
 
@@ -560,9 +560,9 @@ func TestUpdateLinks(t *testing.T) {
 				}
 				mock.ExpectBegin()
 				mock.ExpectQuery("SELECT * FROM links WHERE profile_id = ?").WithArgs(99).
-					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "created_at", "updated_at"}))
-				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url) VALUES (?, ?, ?)").
-					WithArgs(99, 1, "https://example.com").
+					WillReturnRows(sqlmock.NewRows([]string{"id", "profile_id", "platform_id", "url", "position", "created_at", "updated_at"}))
+				mock.ExpectExec("INSERT INTO links (profile_id, platform_id, url, position) VALUES (?, ?, ?, ?)").
+					WithArgs(99, 1, "https://example.com", 0).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				mock.ExpectCommit()
 

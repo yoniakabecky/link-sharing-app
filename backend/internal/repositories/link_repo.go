@@ -73,7 +73,7 @@ func (r *LinkRepository) DeleteLinkByIDTx(ctx context.Context, tx *sqlx.Tx, link
 }
 
 func createLink(ctx context.Context, tx *sqlx.Tx, link *models.Link) error {
-	res, err := tx.NamedExecContext(ctx, "INSERT INTO links (profile_id, platform_id, url) VALUES (:profile_id, :platform_id, :url)", link)
+	res, err := tx.NamedExecContext(ctx, "INSERT INTO links (profile_id, platform_id, url, position) VALUES (:profile_id, :platform_id, :url, :position)", link)
 	if err != nil {
 		return fmt.Errorf("error inserting link: %w", err)
 	}
@@ -89,7 +89,7 @@ func updateLink(ctx context.Context, tx *sqlx.Tx, l *models.Link) error {
 	if l.ID == 0 {
 		return createLink(ctx, tx, l)
 	}
-	_, err := tx.NamedExecContext(ctx, "UPDATE links SET platform_id = :platform_id, url = :url WHERE id = :id", l)
+	_, err := tx.NamedExecContext(ctx, "UPDATE links SET platform_id = :platform_id, url = :url, position = :position WHERE id = :id", l)
 	if err != nil {
 		return fmt.Errorf("error updating link: %w", err)
 	}
