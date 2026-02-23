@@ -1,0 +1,36 @@
+package repositories
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/models"
+)
+
+type UserRepository struct {
+	db *sqlx.DB
+}
+
+func NewUserRepository(db *sqlx.DB) *UserRepository {
+	return &UserRepository{
+		db: db,
+	}
+}
+
+func (r *UserRepository) Register(ctx context.Context, u *models.RegisterUser) (*models.ResponseUser, error) {
+	res, err := r.db.NamedExecContext(ctx, "INSERT INTO users (email, password) VALUES (:email, :password)", u)
+	if err != nil {
+		return nil, fmt.Errorf("error registering user: %w", err)
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return nil, fmt.Errorf("error getting last insert ID: %w", err)
+	}
+	ru := models.ResponseUser{
+		ID:    int(id),
+		Email: u.Email,
+	}
+	return &ru, nil
+}

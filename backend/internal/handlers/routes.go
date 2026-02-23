@@ -9,6 +9,7 @@ type Handlers struct {
 	Platform *PlatformHandler
 	Profile  *ProfileHandler
 	Link     *LinkHandler
+	User     *UserHandler
 }
 
 func RegisterRoutes(h *Handlers) *chi.Mux {
@@ -29,6 +30,10 @@ func RegisterRoutes(h *Handlers) *chi.Mux {
 	r.Route("/links", func(r chi.Router) {
 		r.Get("/{profile_id}", h.Link.GetLinksByProfileID)
 		r.Put("/{profile_id}", h.Link.UpdateLinks)
+	})
+
+	r.Route("/auth", func(r chi.Router) {
+		r.Post("/register", h.User.Register)
 	})
 
 	return r
