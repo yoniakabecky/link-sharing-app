@@ -10,7 +10,7 @@ type User struct {
 	UpdatedAt *time.Time `json:"updated_at" db:"updated_at"`
 }
 
-type RegisterUser struct {
+type UserAuthInput struct {
 	Email    string `json:"email" db:"email" validate:"required,email"`
 	Password string `json:"password" db:"password" validate:"required"`
 }

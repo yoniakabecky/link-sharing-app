@@ -22,7 +22,7 @@ func NewUserHandler(services *services.UserServices) *UserHandler {
 }
 
 func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
-	body := new(models.RegisterUser)
+	body := new(models.UserAuthInput)
 	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -36,5 +36,22 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(u)
+}
+
+func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
+	body := new(models.UserAuthInput)
+	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	u, err := h.services.Login(h.ctx, body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(u)
 }

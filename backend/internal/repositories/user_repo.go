@@ -18,7 +18,7 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 	}
 }
 
-func (r *UserRepository) Register(ctx context.Context, u *models.RegisterUser) (*models.ResponseUser, error) {
+func (r *UserRepository) Register(ctx context.Context, u *models.UserAuthInput) (*models.ResponseUser, error) {
 	res, err := r.db.NamedExecContext(ctx, "INSERT INTO users (email, password) VALUES (:email, :password)", u)
 	if err != nil {
 		return nil, fmt.Errorf("error registering user: %w", err)
@@ -33,4 +33,13 @@ func (r *UserRepository) Register(ctx context.Context, u *models.RegisterUser) (
 		Email: u.Email,
 	}
 	return &ru, nil
+}
+
+func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	user := models.User{}
+	err := r.db.GetContext(ctx, &user, "SELECT * FROM users WHERE email = ?", email)
+	if err != nil {
+		return nil, fmt.Errorf("error getting user by email: %w", err)
+	}
+	return &user, nil
 }
