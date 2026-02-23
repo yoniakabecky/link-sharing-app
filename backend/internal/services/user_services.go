@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/models"
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/pkg/password"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/repositories"
 )
 
@@ -26,5 +27,12 @@ func (s *UserServices) Register(ctx context.Context, u *models.RegisterUser) (*m
 	if err != nil {
 		return nil, errors.New("validation error: " + err.Error())
 	}
+
+	hash, err := password.HashPassword(u.Password)
+	if err != nil {
+		return nil, errors.New("error hashing password: " + err.Error())
+	}
+	u.Password = hash
+
 	return s.repo.Register(ctx, u)
 }
