@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/config"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/models"
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/pkg/jwt"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/services"
 )
 
@@ -51,7 +54,14 @@ func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	secret := []byte(config.Load().JWT.Key)
+	token, err := jwt.GenerateJWT(secret, strconv.Itoa(u.ID))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(u)
+	json.NewEncoder(w).Encode(map[string]string{"token": token})
 }
