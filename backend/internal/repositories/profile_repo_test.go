@@ -303,6 +303,77 @@ func TestGetProfileByID(t *testing.T) {
 	}
 }
 
+func TestGetProfilesByUserID(t *testing.T) {
+	ps := []models.Profile{
+		{
+			ID:        1,
+			UserID:    1,
+			FirstName: "John",
+			LastName:  "Doe",
+			Email:     "john.doe@example.com",
+			AvatarURL: "https://example.com/avatar.png",
+		},
+		{
+			ID:        2,
+			UserID:    1,
+			FirstName: "Jane",
+			LastName:  "Doe",
+			Email:     "jane.doe@example.com",
+			AvatarURL: "https://example.com/avatar.png",
+		},
+	}
+
+	tsc := []struct {
+		name string
+		test func(*testing.T, *ProfileRepository, sqlmock.Sqlmock)
+	}{
+		{
+			name: "success",
+			test: func(t *testing.T, repo *ProfileRepository, mock sqlmock.Sqlmock) {
+				now := time.Now()
+				prow := sqlmock.NewRows([]string{"id", "user_id", "first_name", "last_name", "email", "avatar_url", "created_at", "updated_at"}).
+					AddRow(ps[0].ID, 1, ps[0].FirstName, ps[0].LastName, ps[0].Email, ps[0].AvatarURL, now, nil).
+					AddRow(ps[1].ID, 1, ps[1].FirstName, ps[1].LastName, ps[1].Email, ps[1].AvatarURL, now, nil)
+				mock.ExpectQuery("SELECT * FROM profiles WHERE user_id = ?").WithArgs(1).WillReturnRows(prow)
+
+				p, err := repo.GetProfilesByUserID(context.Background(), 1)
+				require.NoError(t, err)
+
+				expected := []models.Profile{
+					{ID: ps[0].ID, UserID: 1, FirstName: ps[0].FirstName, LastName: ps[0].LastName, Email: ps[0].Email, AvatarURL: ps[0].AvatarURL, CreatedAt: now, UpdatedAt: nil},
+					{ID: ps[1].ID, UserID: 1, FirstName: ps[1].FirstName, LastName: ps[1].LastName, Email: ps[1].Email, AvatarURL: ps[1].AvatarURL, CreatedAt: now, UpdatedAt: nil},
+				}
+				require.Equal(t, expected, p)
+
+				err = mock.ExpectationsWereMet()
+				require.NoError(t, err)
+			},
+		},
+		{
+			name: "failed to get profile",
+			test: func(t *testing.T, repo *ProfileRepository, mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT * FROM profiles WHERE user_id = ?").WithArgs(1).WillReturnError(errors.New("failed to get profile"))
+
+				_, err := repo.GetProfilesByUserID(context.Background(), 1)
+				require.Error(t, err)
+
+				err = mock.ExpectationsWereMet()
+				require.NoError(t, err)
+			},
+		},
+	}
+	for _, tc := range tsc {
+		t.Run(tc.name, func(t *testing.T) {
+			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
+				pRepo := NewPlatformRepository(db)
+				linkRepo := NewLinkRepository(db, pRepo)
+				repo := NewProfileRepository(db, linkRepo)
+				tc.test(t, repo, mock)
+			})
+		})
+	}
+}
+
 func TestUpdateProfile(t *testing.T) {
 	pls := []models.Link{
 		{

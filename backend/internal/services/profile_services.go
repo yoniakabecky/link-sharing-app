@@ -21,6 +21,10 @@ func (s *ProfileServices) GetProfileByID(ctx context.Context, id int) (*models.P
 	return s.repo.GetProfileByID(ctx, id)
 }
 
+func (s *ProfileServices) GetProfilesByUserID(ctx context.Context, userID int) ([]models.Profile, error) {
+	return s.repo.GetProfilesByUserID(ctx, userID)
+}
+
 func (s *ProfileServices) CreateProfile(ctx context.Context, p *models.Profile) (*models.Profile, error) {
 	return s.repo.CreateProfile(ctx, p)
 }

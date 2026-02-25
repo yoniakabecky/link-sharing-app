@@ -78,6 +78,15 @@ func (r *ProfileRepository) GetProfileByID(ctx context.Context, id int) (*models
 	return &p, nil
 }
 
+func (r *ProfileRepository) GetProfilesByUserID(ctx context.Context, userID int) ([]models.Profile, error) {
+	var profiles []models.Profile
+	err := r.db.SelectContext(ctx, &profiles, "SELECT * FROM profiles WHERE user_id = ?", userID)
+	if err != nil {
+		return nil, fmt.Errorf("error getting profiles: %w", err)
+	}
+	return profiles, nil
+}
+
 func (r *ProfileRepository) UpdateProfile(ctx context.Context, p *models.Profile) (*models.Profile, error) {
 	err := r.execTx(ctx, func(tx *sqlx.Tx) error {
 		_, err := tx.NamedExecContext(ctx, "UPDATE profiles SET first_name = :first_name, last_name = :last_name, email = :email, avatar_url = :avatar_url WHERE id = :id", p)

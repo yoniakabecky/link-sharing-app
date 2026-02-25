@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/models"
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/pkg/jwt"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/services"
 )
 
@@ -40,6 +41,25 @@ func (h *ProfileHandler) GetProfileByID(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(p)
+}
+
+func (h *ProfileHandler) GetProfilesByUserID(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(jwt.UserCtxKey).(string)
+	userIDInt, err := strconv.Atoi(userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	profiles, err := h.services.GetProfilesByUserID(h.ctx, userIDInt)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(profiles)
 }
 
 func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
