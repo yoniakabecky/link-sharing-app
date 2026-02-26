@@ -17,3 +17,5 @@
 <Story name="Subtle Active" args={{ 'data-variant': 'subtle', 'data-active': true }}>
 	Subtle Active Button
 </Story>
+
+<Story name="Busy" args={{ 'aria-busy': true }}>Busy Button</Story>
