@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import logo from '$lib/assets/logo.svg';
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
+	import LogoLink from '$lib/components/LogoLink.svelte';
 	import { toast } from 'svelte-sonner';
 
 	let isPreview = $derived(page.url.pathname === '/preview');
@@ -18,9 +18,7 @@
 </script>
 
 {#snippet MainNav()}
-	<a href="/" class="logo-link">
-		<img src={logo} alt="Logo" /><span class="logo-text desktop-only">devlinks</span>
-	</a>
+	<LogoLink />
 
 	<nav>
 		<ul>
@@ -71,20 +69,6 @@
 		background-color: var(--color-card);
 		padding: var(--spacing-3);
 		border-radius: var(--radius-md);
-	}
-
-	.logo-link {
-		display: flex;
-		align-items: center;
-		gap: var(--spacing-1);
-		text-decoration: none;
-		color: inherit;
-	}
-
-	.logo-text {
-		font-size: 1.375rem;
-		font-weight: 700;
-		letter-spacing: -0.03em;
 	}
 
 	nav ul {
