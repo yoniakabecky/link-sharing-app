@@ -1,10 +1,11 @@
 <script>
+	import { login } from '$lib/remote/auth.remote';
 	import AuthForm from '../AuthForm.svelte';
 </script>
 
 <h1>Login</h1>
 
-<AuthForm buttonText="Login" />
+<AuthForm buttonText="Login" {...login} pending={!!login.pending} />
 
 <div class="register-link">
 	<span>Don't have an account?</span>

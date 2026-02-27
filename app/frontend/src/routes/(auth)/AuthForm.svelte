@@ -1,22 +1,48 @@
 <script lang="ts">
+	import type { RemoteFormFields } from '@sveltejs/kit';
 	import Button from '$lib/components/Button.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
+	import type { AuthInput } from '$lib/models/auth';
 
 	type Props = {
 		buttonText: string;
-	};
+		pending: boolean;
+		fields: RemoteFormFields<AuthInput>;
+	} & svelteHTML.IntrinsicElements['form'];
 
-	let { buttonText }: Props = $props();
+	let showPassword = $state(false);
+
+	let { buttonText, fields, pending, ...props }: Props = $props();
 </script>
 
-<form>
+<form novalidate {...props}>
 	<div>
-		<TextInput label="Email" placeholder="Email" />
+		<TextInput label="Email" placeholder="Email" {...fields?.email?.as('email')} />
+		{#each fields?.email?.issues() as issue}
+			<small class="issue">{issue.message}</small>
+		{/each}
 	</div>
 	<div>
-		<TextInput label="Password" placeholder="Password" />
+		<TextInput
+			label="Password"
+			placeholder="Password"
+			{...fields?.password?.as('password')}
+			type={showPassword ? 'text' : 'password'}
+		/>
+		{#each fields?.password?.issues() as issue}
+			<small class="issue">{issue.message}</small>
+		{/each}
+		<div class="show-password">
+			<input
+				type="checkbox"
+				id="show-password"
+				value={showPassword}
+				onchange={() => (showPassword = !showPassword)}
+			/>
+			<label for="show-password">Show password</label>
+		</div>
 	</div>
-	<Button type="submit">{buttonText}</Button>
+	<Button type="submit" aria-busy={pending}>{buttonText}</Button>
 </form>
 
 <style>
@@ -27,21 +53,18 @@
 		inline-size: 100%;
 	}
 
-	.register-link {
+	.show-password {
 		display: flex;
-		justify-content: center;
-		gap: var(--spacing-2);
-		margin-block: var(--spacing-4);
-		color: var(--color-text-secondary);
+		gap: var(--spacing-1);
+		margin-inline: var(--spacing-1);
+		margin-block-start: var(--spacing-2);
 		font-size: var(--font-size-xs);
+		color: var(--color-text-secondary);
 	}
 
-	.register-link a {
-		color: var(--color-dark-purple);
-		text-decoration: none;
-	}
-
-	.register-link a:hover {
-		text-decoration: underline;
+	.issue {
+		margin-block-start: var(--spacing-1);
+		margin-inline-start: var(--spacing-1);
+		color: var(--color-error-red);
 	}
 </style>

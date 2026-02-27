@@ -9,6 +9,8 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>devlinks</title>
+	<meta name="description" content="A platform for sharing your links with the world" />
 </svelte:head>
 
 {@render children()}
