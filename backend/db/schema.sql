@@ -55,6 +55,7 @@ CREATE TABLE `platforms` (
 CREATE TABLE `profiles` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
+  `nickname` varchar(255) NOT NULL DEFAULT '',
   `first_name` varchar(255) NOT NULL,
   `last_name` varchar(255) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -120,5 +121,6 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20260129134153'),
   ('20260130122009'),
   ('20260222130905'),
-  ('20260222142543');
+  ('20260222142543'),
+  ('20260225143156');
 UNLOCK TABLES;

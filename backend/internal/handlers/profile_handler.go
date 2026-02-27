@@ -63,6 +63,13 @@ func (h *ProfileHandler) GetProfilesByUserID(w http.ResponseWriter, r *http.Requ
 }
 
 func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(jwt.UserCtxKey).(string)
+	userIDInt, err := strconv.Atoi(userID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	body := new(models.Profile)
 	if err := json.NewDecoder(r.Body).Decode(body); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -70,12 +77,13 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	prof := models.Profile{
-		UserID:    body.UserID,
+		UserID:    userIDInt,
+		Nickname:  body.Nickname,
 		FirstName: body.FirstName,
 		LastName:  body.LastName,
 		Email:     body.Email,
 		AvatarURL: body.AvatarURL,
-		Links:     body.Links,
+		Links:     nil,
 	}
 
 	p, err := h.services.CreateProfile(h.ctx, &prof)

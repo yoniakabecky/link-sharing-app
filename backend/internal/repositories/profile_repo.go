@@ -48,7 +48,7 @@ func (r *ProfileRepository) CreateProfile(ctx context.Context, p *models.Profile
 }
 
 func createProfile(ctx context.Context, tx *sqlx.Tx, p *models.Profile) (*models.Profile, error) {
-	res, err := tx.NamedExecContext(ctx, "INSERT INTO profiles (user_id, first_name, last_name, email, avatar_url) VALUES (:user_id, :first_name, :last_name, :email, :avatar_url)", p)
+	res, err := tx.NamedExecContext(ctx, "INSERT INTO profiles (user_id, nickname, first_name, last_name, email, avatar_url) VALUES (:user_id, :nickname, :first_name, :last_name, :email, :avatar_url)", p)
 	if err != nil {
 		return nil, fmt.Errorf("error inserting profile: %w", err)
 	}

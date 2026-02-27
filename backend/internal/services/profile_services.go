@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/models"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/repositories"
@@ -26,6 +27,11 @@ func (s *ProfileServices) GetProfilesByUserID(ctx context.Context, userID int) (
 }
 
 func (s *ProfileServices) CreateProfile(ctx context.Context, p *models.Profile) (*models.Profile, error) {
+	err := validate.Struct(p)
+	if err != nil {
+		return nil, errors.New("validation error: " + err.Error())
+	}
+
 	return s.repo.CreateProfile(ctx, p)
 }
 
