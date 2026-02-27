@@ -37,9 +37,16 @@ func (h *UserHandler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	secret := []byte(config.Load().JWT.Key)
+	token, err := jwt.GenerateJWT(secret, strconv.Itoa(u.ID))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(u)
+	json.NewEncoder(w).Encode(map[string]string{"token": token})
 }
 
 func (h *UserHandler) Login(w http.ResponseWriter, r *http.Request) {
