@@ -1,4 +1,4 @@
-import { form, getRequestEvent } from '$app/server';
+import { form, getRequestEvent, query } from '$app/server';
 import { API_BASE_URL } from '$env/static/private';
 import { authInputSchema } from '$lib/models/auth';
 import { invalid, redirect } from '@sveltejs/kit';
@@ -19,10 +19,10 @@ export const register = form(authInputSchema, async (data, issue) => {
 			invalid(`Error registering user: ${message}`);
 		}
 	}
-	const token = await response.json();
+	const { token } = await response.json();
 	cookies.set('token', token, { path: '/' });
 
-	redirect(302, '/');
+	redirect(302, '/dashboard');
 });
 
 export const login = form(authInputSchema, async (data) => {
@@ -37,10 +37,16 @@ export const login = form(authInputSchema, async (data) => {
 		console.error('response error:', response.statusText);
 		invalid(`Error logging in: ${response.statusText}`);
 	}
-	const token = await response.json();
+	const { token } = await response.json();
 	cookies.set('token', token, { path: '/' });
 
 	await new Promise((resolve) => setTimeout(resolve, 500));
 
-	redirect(302, '/');
+	redirect(302, '/dashboard');
+});
+
+export const hasToken = query(async () => {
+	const { cookies } = getRequestEvent();
+	const token = cookies.get('token');
+	return !!token;
 });

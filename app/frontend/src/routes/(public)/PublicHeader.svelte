@@ -2,9 +2,9 @@
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import LogoLink from '$lib/components/LogoLink.svelte';
+	import { hasToken } from '$lib/remote/auth.remote';
 
-	// TODO: replace with actual authentication status
-	let isAuthenticated = false;
+	let isAuthenticated = await hasToken();
 </script>
 
 <header>
