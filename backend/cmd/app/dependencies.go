@@ -23,11 +23,12 @@ func InitializeDependencies(cfg *config.Config) (*Dependencies, error) {
 	linkRepo := repositories.NewLinkRepository(dbConn.GetDB(), pltRepo)
 	prfRepo := repositories.NewProfileRepository(dbConn.GetDB(), linkRepo)
 	userRepo := repositories.NewUserRepository(dbConn.GetDB())
+	rtRepo := repositories.NewRefreshTokenRepository(dbConn.GetDB())
 
 	pltSrv := services.NewPlatformServices(pltRepo)
 	prfSrv := services.NewProfileServices(prfRepo)
 	linkSrv := services.NewLinkServices(linkRepo)
-	userSrv := services.NewUserServices(userRepo)
+	userSrv := services.NewUserServices(userRepo, rtRepo)
 
 	pltHdl := handlers.NewPlatformHandler(pltSrv)
 	prfHdl := handlers.NewProfileHandler(prfSrv)

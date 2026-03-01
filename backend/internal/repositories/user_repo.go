@@ -43,3 +43,12 @@ func (r *UserRepository) GetUserByEmail(ctx context.Context, email string) (*mod
 	}
 	return &user, nil
 }
+
+func (r *UserRepository) GetUserByID(ctx context.Context, id int) (*models.User, error) {
+	user := models.User{}
+	err := r.db.GetContext(ctx, &user, "SELECT id, email, password, created_at, updated_at FROM users WHERE id = ?", id)
+	if err != nil {
+		return nil, fmt.Errorf("error getting user by ID: %w", err)
+	}
+	return &user, nil
+}

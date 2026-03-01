@@ -29,8 +29,9 @@ type DatabaseConfig struct {
 }
 
 type JWTConfig struct {
-	Key string
-	Exp int64
+	Key        string
+	Exp        int64 // access token expiry in seconds (e.g. 900 = 15 min)
+	RefreshExp int64 // refresh token expiry in seconds (e.g. 7 days)
 }
 
 // returns the Data Source Name for database connection
@@ -52,8 +53,9 @@ func Load() *Config {
 			Database: getEnv("DB_NAME", "link-sharing-app"),
 		},
 		JWT: JWTConfig{
-			Key: getEnv("JWT_KEY", "secret"),
-			Exp: getEnvAsInt("JWT_EXP", 3600*24*7),
+			Key:        getEnv("JWT_KEY", "secret"),
+			Exp:        getEnvAsInt("JWT_EXP", 60*15),              // 15 min default
+			RefreshExp: getEnvAsInt("JWT_REFRESH_EXP", 60*60*24*7), // 7 days default
 		},
 	}
 }

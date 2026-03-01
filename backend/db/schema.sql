@@ -69,6 +69,26 @@ CREATE TABLE `profiles` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `refresh_tokens`
+--
+
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `refresh_tokens` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int NOT NULL,
+  `token_hash` varchar(64) NOT NULL,
+  `expires_at` timestamp NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_token_hash` (`token_hash`),
+  KEY `idx_expires_at` (`expires_at`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `refresh_tokens_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `schema_migrations`
 --
 
@@ -122,5 +142,6 @@ INSERT INTO `schema_migrations` (version) VALUES
   ('20260130122009'),
   ('20260222130905'),
   ('20260222142543'),
-  ('20260225143156');
+  ('20260225143156'),
+  ('20260301120000');
 UNLOCK TABLES;

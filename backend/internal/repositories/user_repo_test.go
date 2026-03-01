@@ -12,6 +12,14 @@ import (
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/models"
 )
 
+func TestNewUserRepository(t *testing.T) {
+	withTestDB(t, func(db *sqlx.DB, _ sqlmock.Sqlmock) {
+		repo := NewUserRepository(db)
+		require.NotNil(t, repo)
+		require.NotNil(t, repo.db)
+	})
+}
+
 func TestRegister(t *testing.T) {
 	ctx := context.Background()
 	input := &models.UserAuthInput{Email: "test@example.com", Password: "hashed"}
@@ -110,6 +118,57 @@ func TestGetUserByEmail(t *testing.T) {
 				_, err := repo.GetUserByEmail(ctx, email)
 				require.Error(t, err)
 				require.Contains(t, err.Error(), "error getting user by email")
+
+				require.NoError(t, mock.ExpectationsWereMet())
+			},
+		},
+	}
+
+	for _, tc := range tsc {
+		t.Run(tc.name, func(t *testing.T) {
+			withTestDB(t, func(db *sqlx.DB, mock sqlmock.Sqlmock) {
+				repo := NewUserRepository(db)
+				tc.test(t, repo, mock)
+			})
+		})
+	}
+}
+
+func TestGetUserByID(t *testing.T) {
+	ctx := context.Background()
+	userID := 1
+
+	tsc := []struct {
+		name string
+		test func(*testing.T, *UserRepository, sqlmock.Sqlmock)
+	}{
+		{
+			name: "success",
+			test: func(t *testing.T, repo *UserRepository, mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT id, email, password, created_at, updated_at FROM users WHERE id = ?").
+					WithArgs(userID).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "email", "password", "created_at", "updated_at"}).
+						AddRow(1, "test@example.com", "hashed", time.Time{}, nil))
+
+				user, err := repo.GetUserByID(ctx, userID)
+				require.NoError(t, err)
+				require.Equal(t, 1, user.ID)
+				require.Equal(t, "test@example.com", user.Email)
+				require.Equal(t, "hashed", user.Password)
+
+				require.NoError(t, mock.ExpectationsWereMet())
+			},
+		},
+		{
+			name: "failed to get user by ID",
+			test: func(t *testing.T, repo *UserRepository, mock sqlmock.Sqlmock) {
+				mock.ExpectQuery("SELECT id, email, password, created_at, updated_at FROM users WHERE id = ?").
+					WithArgs(userID).
+					WillReturnError(errors.New("no rows"))
+
+				_, err := repo.GetUserByID(ctx, userID)
+				require.Error(t, err)
+				require.Contains(t, err.Error(), "error getting user by ID")
 
 				require.NoError(t, mock.ExpectationsWereMet())
 			},

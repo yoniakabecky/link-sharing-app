@@ -21,6 +21,7 @@ func RegisterRoutes(h *Handlers) *chi.Mux {
 	r.Route("/auth", func(r chi.Router) {
 		r.Post("/register", h.User.Register)
 		r.Post("/login", h.User.Login)
+		r.Post("/refresh", h.User.Refresh)
 	})
 	r.Route("/public", func(r chi.Router) {
 		r.Get("/profiles/{id}", h.Profile.GetProfileByID)
@@ -29,6 +30,7 @@ func RegisterRoutes(h *Handlers) *chi.Mux {
 	// Protected routes: require valid JWT
 	r.Group(func(r chi.Router) {
 		r.Use(jwt.Middleware)
+		r.Get("/auth/session", h.User.Session)
 		r.Route("/platforms", func(r chi.Router) {
 			r.Get("/", h.Platform.GetAllPlatforms)
 		})
