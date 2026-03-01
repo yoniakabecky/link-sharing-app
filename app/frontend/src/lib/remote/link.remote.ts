@@ -1,11 +1,13 @@
 import * as v from 'valibot';
 import { error, invalid } from '@sveltejs/kit';
 import { form, query } from '$app/server';
-import { API_BASE_URL } from '$env/static/private';
 import { updateLinksSchema, type Link } from '$lib/models/link';
+import { apiGet, apiPut } from '$lib/fetcher';
+import { requireAuth } from '$lib/require-auth';
 
 export const getLinks = query(v.string(), async (profileID) => {
-	const response = await fetch(`${API_BASE_URL}/links/${profileID}`);
+	const { token } = requireAuth();
+	const response = await apiGet(`/links/${profileID}`, token);
 	if (!response.ok) {
 		error(response.status, `Error fetching links: ${response.statusText}`);
 	}
@@ -16,6 +18,7 @@ export const getLinks = query(v.string(), async (profileID) => {
 
 export const updateLinks = form(updateLinksSchema, async ({ links }) => {
 	try {
+		const { token } = requireAuth();
 		const body = links.map((link) => ({
 			id: Number(link.id),
 			platform_id: Number(link.platform_id),
@@ -23,10 +26,7 @@ export const updateLinks = form(updateLinksSchema, async ({ links }) => {
 		}));
 		// TODO: replace profileId with the actual profile ID
 		const profileId = '7';
-		const response = await fetch(`${API_BASE_URL}/links/${profileId}`, {
-			method: 'PUT',
-			body: JSON.stringify(body)
-		});
+		const response = await apiPut(`/links/${profileId}`, token, { body: JSON.stringify(body) });
 		if (!response.ok) {
 			invalid(`Error updating links: ${response.statusText}`);
 		}

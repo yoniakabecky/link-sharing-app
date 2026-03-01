@@ -1,10 +1,12 @@
 import { error } from '@sveltejs/kit';
 import { query } from '$app/server';
-import { API_BASE_URL } from '$env/static/private';
 import type { Platform } from '$lib/models/platform';
+import { apiGet } from '$lib/fetcher';
+import { requireAuth } from '$lib/require-auth';
 
 export const getPlatforms = query(async () => {
-	const response = await fetch(`${API_BASE_URL}/platforms`);
+	const { token } = requireAuth();
+	const response = await apiGet(`/platforms`, token);
 	if (!response.ok) {
 		error(response.status, `Error fetching platforms: ${response.statusText}`);
 	}

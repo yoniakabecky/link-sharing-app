@@ -1,11 +1,13 @@
 import * as v from 'valibot';
 import { error, invalid } from '@sveltejs/kit';
 import { form, query } from '$app/server';
-import { API_BASE_URL } from '$env/static/private';
 import { updateProfileSchema, type Profile } from '$lib/models/profile';
+import { apiGet, apiPut } from '$lib/fetcher';
+import { requireAuth } from '$lib/require-auth';
 
 export const getProfile = query(v.string(), async (profileID) => {
-	const response = await fetch(`${API_BASE_URL}/profiles/${profileID}`);
+	const { token } = requireAuth();
+	const response = await apiGet(`/profiles/${profileID}`, token);
 	if (!response.ok) {
 		error(response.status, `Error fetching profile: ${response.statusText}`);
 	}
@@ -16,10 +18,10 @@ export const getProfile = query(v.string(), async (profileID) => {
 
 export const updateProfile = form(updateProfileSchema, async (profile) => {
 	try {
+		const { token } = requireAuth();
 		// TODO: replace profileId with the actual profile ID
 		const profileId = '7';
-		const response = await fetch(`${API_BASE_URL}/profiles/${profileId}`, {
-			method: 'PUT',
+		const response = await apiPut(`/profiles/${profileId}`, token, {
 			body: JSON.stringify(profile)
 		});
 		if (!response.ok) {
