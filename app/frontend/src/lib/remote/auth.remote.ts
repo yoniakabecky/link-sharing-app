@@ -1,7 +1,12 @@
 import { form, getRequestEvent, query } from '$app/server';
 import { API_BASE_URL } from '$env/static/private';
-import { authInputSchema } from '$lib/models/auth';
-import { invalid, redirect } from '@sveltejs/kit';
+import { authInputSchema, type AuthResponse } from '$lib/models/auth';
+import { invalid, redirect, type Cookies } from '@sveltejs/kit';
+
+const setAuthCookies = (cookies: Cookies, data: AuthResponse) => {
+	cookies.set('token', data.access_token, { path: '/' });
+	cookies.set('refresh_token', data.refresh_token, { path: '/' });
+};
 
 export const register = form(authInputSchema, async (data, issue) => {
 	const { cookies } = getRequestEvent();
@@ -19,9 +24,8 @@ export const register = form(authInputSchema, async (data, issue) => {
 			invalid(`Error registering user: ${message}`);
 		}
 	}
-	const { token } = await response.json();
-	cookies.set('token', token, { path: '/' });
-
+	const body = await response.json();
+	setAuthCookies(cookies, body);
 	redirect(302, '/dashboard');
 });
 
@@ -37,11 +41,8 @@ export const login = form(authInputSchema, async (data) => {
 		console.error('response error:', response.statusText);
 		invalid(`Error logging in: ${response.statusText}`);
 	}
-	const { token } = await response.json();
-	cookies.set('token', token, { path: '/' });
-
-	await new Promise((resolve) => setTimeout(resolve, 500));
-
+	const body = await response.json();
+	setAuthCookies(cookies, body);
 	redirect(302, '/dashboard');
 });
 

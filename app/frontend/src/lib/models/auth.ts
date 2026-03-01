@@ -10,3 +10,15 @@ export const authInputSchema = v.object({
 });
 
 export type AuthInput = v.InferOutput<typeof authInputSchema>;
+
+export type User = {
+	id: number;
+	email: string;
+};
+
+export type AuthResponse = {
+	access_token: string;
+	refresh_token: string;
+	expires_in: number;
+	user: User;
+};

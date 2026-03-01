@@ -4,15 +4,13 @@ import { redirect } from '@sveltejs/kit';
 export const requireAuth = () => {
 	const { locals, cookies } = getRequestEvent();
 
-	// TODO: add session check
-
-	const token = cookies.get('token');
-	if (!token) {
+	if (!locals.user) {
 		redirect(307, '/login');
 	}
 
+	const token = cookies.get('token');
 	return {
 		user: locals.user,
-		token: token
+		token: token ?? ''
 	};
 };
