@@ -34,6 +34,7 @@ func RegisterRoutes(h *Handlers) *chi.Mux {
 		})
 		r.Route("/profiles", func(r chi.Router) {
 			r.Get("/", h.Profile.GetProfilesByUserID)
+			r.Get("/{id}", h.Profile.GetProfileByID)
 			r.Post("/", h.Profile.CreateProfile)
 			r.Put("/{id}", h.Profile.UpdateProfile)
 			r.Delete("/{id}", h.Profile.DeleteProfile)
