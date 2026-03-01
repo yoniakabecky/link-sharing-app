@@ -18,7 +18,7 @@
 </script>
 
 {#snippet MainNav()}
-	<LogoLink />
+	<LogoLink href="/dashboard" />
 
 	<nav>
 		<ul>

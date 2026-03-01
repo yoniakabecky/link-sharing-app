@@ -1,8 +1,10 @@
 <script lang="ts">
 	import logo from '$lib/assets/logo.svg';
+
+	const { href = '/' } = $props();
 </script>
 
-<a href="/" class="logo-link">
+<a {href} class="logo-link">
 	<img src={logo} alt="Logo" /><span class="logo-text desktop-only">devlinks</span>
 </a>
 
