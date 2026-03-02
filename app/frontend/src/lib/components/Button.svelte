@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 
 	type Props = {
-		variant?: 'primary' | 'outlined' | 'subtle';
+		variant?: 'primary' | 'outlined' | 'subtle' | 'subtle-outlined' | 'danger';
 		href?: string;
 		children: Snippet;
 	} & svelteHTML.IntrinsicElements['button'];
@@ -96,6 +96,25 @@
 	}
 	button[data-variant='subtle'][data-active='true']:hover:not(:disabled) {
 		opacity: 0.8;
+	}
+
+	button[data-variant='subtle-outlined'] {
+		background-color: transparent;
+		color: var(--color-text-secondary);
+		border: 1px solid var(--color-text-secondary);
+	}
+	button[data-variant='subtle-outlined']:hover:not(:disabled) {
+		background-color: var(--color-skeleton-gray);
+		opacity: 0.8;
+	}
+
+	button[data-variant='danger'] {
+		background-color: transparent;
+		color: var(--color-error-red);
+		border: 1px solid var(--color-error-red);
+	}
+	button[data-variant='danger']:hover:not(:disabled) {
+		background-color: var(--color-error-light-red);
 	}
 
 	.loader {

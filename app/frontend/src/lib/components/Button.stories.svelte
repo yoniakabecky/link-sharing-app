@@ -18,4 +18,10 @@
 	Subtle Active Button
 </Story>
 
+<Story name="Subtle Outlined" args={{ 'data-variant': 'subtle-outlined' }}
+	>Subtle Outlined Button</Story
+>
+
+<Story name="Danger" args={{ 'data-variant': 'danger' }}>Danger Button</Story>
+
 <Story name="Busy" args={{ 'aria-busy': true }}>Busy Button</Story>
