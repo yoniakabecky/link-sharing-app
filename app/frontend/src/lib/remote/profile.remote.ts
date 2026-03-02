@@ -5,6 +5,17 @@ import { updateProfileSchema, type Profile } from '$lib/models/profile';
 import { apiGet, apiPut } from '$lib/fetcher';
 import { requireAuth } from '$lib/require-auth';
 
+export const getProfiles = query(async () => {
+	const { token } = requireAuth();
+	const response = await apiGet('/profiles', token);
+	if (!response.ok) {
+		error(response.status, `Error fetching profiles: ${response.statusText}`);
+	}
+	const data = (await response.json()) ?? [];
+
+	return data as Profile[];
+});
+
 export const getProfile = query(v.string(), async (profileID) => {
 	const { token } = requireAuth();
 	const response = await apiGet(`/profiles/${profileID}`, token);

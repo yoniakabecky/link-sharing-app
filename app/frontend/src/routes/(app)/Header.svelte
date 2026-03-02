@@ -3,13 +3,13 @@
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import LogoLink from '$lib/components/LogoLink.svelte';
+	import { globalState } from '$lib/state.svelte';
 	import { toast } from 'svelte-sonner';
 
 	let isPreview = $derived(page.url.pathname === '/preview');
 	let pathname = $derived(page.url.pathname);
 
-	// TODO: replace profileID with the actual profile ID
-	const profileID = '7';
+	const profileID = $derived(globalState.profileID);
 	const copyUrl = () => {
 		const url = `${window.location.origin}/shared?id=${profileID}`;
 		navigator.clipboard.writeText(url);
@@ -23,13 +23,23 @@
 	<nav>
 		<ul>
 			<li>
-				<Button variant="subtle" data-active={pathname === '/links'} href="/links">
+				<Button
+					variant="subtle"
+					data-active={pathname === '/links'}
+					href="/links"
+					disabled={!profileID}
+				>
 					<Icon name="link" size={20} />
 					<span class="desktop-only">Links</span>
 				</Button>
 			</li>
 			<li>
-				<Button variant="subtle" data-active={pathname === '/profile'} href="/profile">
+				<Button
+					variant="subtle"
+					data-active={pathname === '/profile'}
+					href="/profile"
+					disabled={!profileID}
+				>
 					<Icon name="user" size={20} />
 					<span class="desktop-only">Profile Details</span>
 				</Button>
@@ -37,7 +47,7 @@
 		</ul>
 	</nav>
 
-	<Button variant="outlined" href="/preview">
+	<Button variant="outlined" href="/preview" disabled={!profileID}>
 		<Icon name="eye" size={20} class="mobile-only" />
 		<span class="desktop-only">Preview</span>
 	</Button>

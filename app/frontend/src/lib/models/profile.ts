@@ -4,6 +4,7 @@ import type { Link } from './link';
 export type Profile = {
 	id: number;
 	user_id: number;
+	nickname: string;
 	first_name: string;
 	last_name: string;
 	email: string;

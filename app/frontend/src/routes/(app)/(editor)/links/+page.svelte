@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import Mockup from '$lib/components/Mockup.svelte';
@@ -7,10 +7,10 @@
 	import type { Link } from '$lib/models/link';
 	import { getLinks, updateLinks } from '$lib/remote/link.remote';
 	import { getPlatforms } from '$lib/remote/platform.remote';
+	import { globalState } from '$lib/state.svelte';
 	import LinksForm from './LinksForm.svelte';
 
-	const profileID = getContext('profileID') as string;
-	const links = await getLinks(profileID);
+	const links = await getLinks(globalState.profileID);
 	const platforms = await getPlatforms();
 
 	onMount(() => {

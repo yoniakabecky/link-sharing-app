@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { getContext, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import Button from '$lib/components/Button.svelte';
 	import Card from '$lib/components/Card.svelte';
 	import Mockup from '$lib/components/Mockup.svelte';
-	import { getProfile, updateProfile } from '$lib/remote/profile.remote';
-	import ProfileForm from './ProfileForm.svelte';
 	import type { UpdateProfile } from '$lib/models/profile';
+	import { getProfile, updateProfile } from '$lib/remote/profile.remote';
+	import { globalState } from '$lib/state.svelte';
+	import ProfileForm from './ProfileForm.svelte';
 
-	const profileID = getContext('profileID') as string;
-	const profile = await getProfile(profileID);
+	const profile = await getProfile(globalState.profileID);
 
 	onMount(() => {
 		updateProfile.fields.set(profile);
