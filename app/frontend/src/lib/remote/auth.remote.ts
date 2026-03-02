@@ -46,6 +46,13 @@ export const login = form(authInputSchema, async (data) => {
 	redirect(302, '/dashboard');
 });
 
+export const logout = form(async () => {
+	const { cookies } = getRequestEvent();
+	cookies.delete('token', { path: '/' });
+	cookies.delete('refresh_token', { path: '/' });
+	redirect(302, '/');
+});
+
 export const hasToken = query(async () => {
 	const { cookies } = getRequestEvent();
 	const token = cookies.get('token');

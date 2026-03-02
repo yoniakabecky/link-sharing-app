@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import Button from '$lib/components/Button.svelte';
+	import { logout } from '$lib/remote/auth.remote';
 	import { getProfiles } from '$lib/remote/profile.remote';
 	import { globalState } from '$lib/state.svelte';
 
@@ -14,7 +15,7 @@
 
 	const onSelectProfile = async (profileID: string) => {
 		globalState.profileID = profileID;
-		// await goto('/profile');
+		await goto('/profile');
 	};
 </script>
 
@@ -27,7 +28,7 @@
 		{#each profiles as profile}
 			<li>
 				<Button
-					variant="outlined"
+					variant={profile.id.toString() === globalState.profileID ? 'primary' : 'outlined'}
 					class="full-width"
 					onclick={() => onSelectProfile(profile.id.toString())}
 				>
@@ -37,9 +38,13 @@
 				</Button>
 			</li>
 		{/each}
-		<li><Button variant="outlined" class="full-width">+ Create A New Profile</Button></li>
+		<li><Button variant="subtle-outlined" class="full-width">+ Create A New Profile</Button></li>
 		<hr class="full-width" />
-		<li><Button variant="outlined" class="full-width">Logout</Button></li>
+		<li>
+			<form {...logout}>
+				<Button variant="danger" class="full-width" type="submit">Logout</Button>
+			</form>
+		</li>
 	</ul>
 </main>
 
