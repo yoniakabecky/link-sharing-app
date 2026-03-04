@@ -4,6 +4,7 @@ import { form, query } from '$app/server';
 import { createProfileSchema, updateProfileSchema, type Profile } from '$lib/models/profile';
 import { apiGet, apiPost, apiPut } from '$lib/fetcher';
 import { requireAuth } from '$lib/require-auth';
+import { globalState } from '$lib/state.svelte';
 
 export const getProfiles = query(async () => {
 	const { token } = requireAuth();
@@ -30,9 +31,7 @@ export const getProfile = query(v.string(), async (profileID) => {
 export const updateProfile = form(updateProfileSchema, async (profile) => {
 	try {
 		const { token } = requireAuth();
-		// TODO: replace profileId with the actual profile ID
-		const profileId = '7';
-		const response = await apiPut(`/profiles/${profileId}`, token, {
+		const response = await apiPut(`/profiles/${globalState.profileID}`, token, {
 			body: JSON.stringify(profile)
 		});
 		if (!response.ok) {
@@ -41,7 +40,7 @@ export const updateProfile = form(updateProfileSchema, async (profile) => {
 		return { success: true };
 	} catch (err) {
 		console.error(err);
-		error(500, `Error updating links: ${err instanceof Error ? err.message : 'Unknown error'}`);
+		error(500, `Error updating profile: ${err instanceof Error ? err.message : 'Unknown error'}`);
 	}
 });
 

@@ -4,6 +4,7 @@ import { form, query } from '$app/server';
 import { updateLinksSchema, type Link } from '$lib/models/link';
 import { apiGet, apiPut } from '$lib/fetcher';
 import { requireAuth } from '$lib/require-auth';
+import { globalState } from '$lib/state.svelte';
 
 export const getLinks = query(v.string(), async (profileID) => {
 	const { token } = requireAuth();
@@ -24,9 +25,10 @@ export const updateLinks = form(updateLinksSchema, async ({ links }) => {
 			platform_id: Number(link.platform_id),
 			url: link.url
 		}));
-		// TODO: replace profileId with the actual profile ID
-		const profileId = '7';
-		const response = await apiPut(`/links/${profileId}`, token, { body: JSON.stringify(body) });
+
+		const response = await apiPut(`/links/${globalState.profileID}`, token, {
+			body: JSON.stringify(body)
+		});
 		if (!response.ok) {
 			invalid(`Error updating links: ${response.statusText}`);
 		}
