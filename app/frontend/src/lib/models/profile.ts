@@ -23,3 +23,13 @@ export const updateProfileSchema = v.object({
 });
 
 export type UpdateProfile = v.InferOutput<typeof updateProfileSchema>;
+
+export const createProfileSchema = v.object({
+	nickname: v.pipe(
+		v.string(),
+		v.nonEmpty('Please enter your nickname.'),
+		v.minLength(2, 'Nickname must be at least 2 characters.')
+	),
+	first_name: v.pipe(v.string(), v.nonEmpty('Please enter your first name.')),
+	last_name: v.pipe(v.string(), v.nonEmpty('Please enter your last name.'))
+});

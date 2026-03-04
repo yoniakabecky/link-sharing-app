@@ -1,8 +1,8 @@
 import * as v from 'valibot';
 import { error, invalid } from '@sveltejs/kit';
 import { form, query } from '$app/server';
-import { updateProfileSchema, type Profile } from '$lib/models/profile';
-import { apiGet, apiPut } from '$lib/fetcher';
+import { createProfileSchema, updateProfileSchema, type Profile } from '$lib/models/profile';
+import { apiGet, apiPost, apiPut } from '$lib/fetcher';
 import { requireAuth } from '$lib/require-auth';
 
 export const getProfiles = query(async () => {
@@ -42,5 +42,22 @@ export const updateProfile = form(updateProfileSchema, async (profile) => {
 	} catch (err) {
 		console.error(err);
 		error(500, `Error updating links: ${err instanceof Error ? err.message : 'Unknown error'}`);
+	}
+});
+
+export const createProfile = form(createProfileSchema, async (data) => {
+	try {
+		const { token } = requireAuth();
+		const response = await apiPost('/profiles', token, {
+			body: JSON.stringify(data)
+		});
+		if (!response.ok) {
+			invalid(`Error creating profile: ${response.statusText}`);
+		}
+		const newProfile = await response.json();
+		return { success: true, profile: newProfile };
+	} catch (err) {
+		console.error(err);
+		error(500, `Error creating profile: ${err instanceof Error ? err.message : 'Unknown error'}`);
 	}
 });

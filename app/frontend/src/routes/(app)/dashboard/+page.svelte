@@ -2,9 +2,11 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import Button from '$lib/components/Button.svelte';
+	import Drawer from '$lib/components/Drawer.svelte';
 	import { logout } from '$lib/remote/auth.remote';
 	import { getProfiles } from '$lib/remote/profile.remote';
 	import { globalState } from '$lib/state.svelte';
+	import CreateProfileForm from './CreateProfileForm.svelte';
 
 	const profiles = await getProfiles();
 	const message = $derived(
@@ -17,6 +19,8 @@
 		globalState.profileID = profileID;
 		await goto('/profile');
 	};
+
+	let open = $state(false);
 </script>
 
 <main>
@@ -38,7 +42,11 @@
 				</Button>
 			</li>
 		{/each}
-		<li><Button variant="subtle-outlined" class="full-width">+ Create A New Profile</Button></li>
+		<li>
+			<Button variant="subtle-outlined" class="full-width" onclick={() => (open = !open)}>
+				+ Create A New Profile
+			</Button>
+		</li>
 		<hr class="full-width" />
 		<li>
 			<form {...logout}>
@@ -47,6 +55,14 @@
 		</li>
 	</ul>
 </main>
+
+<Drawer {open}>
+	{#snippet header()}
+		<h2>Create A New Profile</h2>
+	{/snippet}
+
+	<CreateProfileForm />
+</Drawer>
 
 <style>
 	main {
