@@ -10,6 +10,9 @@
 	};
 
 	let { updateProfile }: Props = $props();
+
+	let haveImage = $derived(!!updateProfile.fields.avatar_url.value());
+	let fileInputMessage = $derived(haveImage ? 'Change Image' : '+ Upload Image');
 </script>
 
 <form
@@ -48,9 +51,9 @@
 				accept="image/*"
 				{...updateProfile.fields.avatar.as('file')}
 			/>
-			<div class="profile-picture-overlay">
+			<div class="profile-picture-overlay" data-have-image={haveImage}>
 				<Icon name="pic_line" size={32} />
-				<div>Change Image</div>
+				<div>{fileInputMessage}</div>
 			</div>
 		</div>
 		<div>
@@ -118,6 +121,7 @@
 		grid-template-columns: 30% 1fr auto;
 		align-items: center;
 	}
+
 	.profile-picture-wrapper {
 		position: relative;
 		width: 164px;
@@ -151,8 +155,18 @@
 		font-weight: 500;
 		transition: background-color 0.2s ease-in-out;
 	}
+
 	.profile-picture-overlay:hover {
 		background-color: rgba(0, 0, 0, 0.3);
+	}
+
+	.profile-picture-overlay:not([data-have-image='true']) {
+		background: var(--color-light-purple);
+		color: var(--color-dark-purple);
+	}
+
+	.profile-picture-overlay:not([data-have-image='true']):hover {
+		opacity: 0.8;
 	}
 
 	input[type='file'] {

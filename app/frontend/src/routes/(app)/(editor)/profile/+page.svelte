@@ -41,8 +41,8 @@
 	<ProfileForm {updateProfile} />
 
 	{#snippet footer()}
-		<div class="end">
-			<Button type="submit" form="profile-form">Save</Button>
+		<div class="footer">
+			<Button type="submit" form="profile-form" class="full-width">Save</Button>
 		</div>
 	{/snippet}
 </Card>
@@ -63,6 +63,10 @@
 		.heading {
 			margin-block-start: 0;
 			font-size: var(--font-size-lg);
+		}
+
+		.footer {
+			inline-size: 100%;
 		}
 	}
 </style>

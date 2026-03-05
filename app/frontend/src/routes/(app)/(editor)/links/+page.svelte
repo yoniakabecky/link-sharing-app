@@ -56,7 +56,9 @@
 	<LinksForm {updateLinks} {platforms} />
 
 	{#snippet footer()}
-		<Button type="submit" form="links-form">Save</Button>
+		<div class="footer">
+			<Button type="submit" form="links-form" class="full-width">Save</Button>
+		</div>
 	{/snippet}
 </Card>
 
@@ -75,6 +77,9 @@
 		.heading {
 			margin-block-start: 0;
 			font-size: var(--font-size-lg);
+		}
+		.footer {
+			inline-size: 100%;
 		}
 	}
 </style>

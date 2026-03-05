@@ -22,6 +22,7 @@
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		min-height: 0;
 	}
 
 	.background-accent {
@@ -33,5 +34,23 @@
 		border-bottom-right-radius: var(--radius-md);
 		background-color: var(--color-dark-purple);
 		z-index: -1;
+	}
+
+	@media (max-width: 480px) {
+		.background-accent {
+			display: none;
+		}
+
+		main {
+			align-items: stretch;
+			justify-content: stretch;
+			width: 100%;
+		}
+
+		main :global(.card) {
+			min-block-size: 100%;
+			border-radius: 0;
+			box-shadow: none !important;
+		}
 	}
 </style>

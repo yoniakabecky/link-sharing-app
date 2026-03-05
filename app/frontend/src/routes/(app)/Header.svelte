@@ -54,11 +54,14 @@
 {/snippet}
 
 {#snippet PreviewNav()}
-	<Button variant="outlined" onclick={() => history.back()}>
-		<Icon name="arrow_left" size={20} class="mobile-only" />
-		<span class="desktop-only">Back to Editor</span>
-	</Button>
-	<Button onclick={() => copyUrl()}>Share Link</Button>
+	<div class="preview-nav-button">
+		<Button variant="outlined" onclick={() => history.back()} class="full-width">
+			Back to Editor
+		</Button>
+	</div>
+	<div class="preview-nav-button">
+		<Button onclick={() => copyUrl()} class="full-width">Share Link</Button>
+	</div>
 {/snippet}
 
 <header>
@@ -74,6 +77,7 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		gap: var(--spacing-4);
 		block-size: 4rem;
 		margin: var(--spacing-5);
 		background-color: var(--color-card);
@@ -88,13 +92,17 @@
 		margin: 0;
 		padding: 0;
 	}
-
 	@media (max-width: 480px) {
 		header {
 			margin: 0;
 			margin-block-end: var(--spacing-3);
 			padding-inline-start: var(--spacing-4);
 			border-radius: 0;
+		}
+
+		.preview-nav-button {
+			flex: 1;
+			max-inline-size: 100%;
 		}
 	}
 </style>
