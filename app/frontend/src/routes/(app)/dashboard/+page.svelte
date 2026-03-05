@@ -3,24 +3,33 @@
 	import { page } from '$app/state';
 	import Button from '$lib/components/Button.svelte';
 	import Drawer from '$lib/components/Drawer.svelte';
+	import type { Profile } from '$lib/models/profile';
 	import { logout } from '$lib/remote/auth.remote';
 	import { getProfiles } from '$lib/remote/profile.remote';
 	import { globalState } from '$lib/state.svelte';
 	import CreateProfileForm from './CreateProfileForm.svelte';
+	import DeleteProfileDialog from './DeleteProfileDialog.svelte';
 
-	const profiles = await getProfiles();
+	const profiles = $derived(await getProfiles());
 	const message = $derived(
 		profiles.length > 0
 			? 'Select a profile to edit or create a new one.'
 			: 'No profiles found. Create a new profile to get started.'
 	);
 
+	let open = $state(false);
+	let deletingProfile = $state<Profile | null>(null);
+	let isDialogOpen = $state(false);
+
 	const onSelectProfile = async (profileID: string) => {
 		globalState.profileID = profileID;
 		await goto('/profile');
 	};
 
-	let open = $state(false);
+	const onDeleteProfile = (profile: Profile) => {
+		deletingProfile = profile;
+		isDialogOpen = true;
+	};
 </script>
 
 <main>
@@ -30,7 +39,7 @@
 
 	<ul class="profiles">
 		{#each profiles as profile}
-			<li>
+			<li class="profile-item">
 				<Button
 					variant={profile.id.toString() === globalState.profileID ? 'primary' : 'outlined'}
 					class="full-width"
@@ -40,9 +49,11 @@
 						{profile.nickname}
 					</span>
 				</Button>
+				<Button variant="danger" onclick={() => onDeleteProfile(profile)}>Delete</Button>
 			</li>
 		{/each}
-		<li>
+
+		<li class="create-button">
 			<Button variant="subtle-outlined" class="full-width" onclick={() => (open = !open)}>
 				+ Create A New Profile
 			</Button>
@@ -63,6 +74,8 @@
 
 	<CreateProfileForm />
 </Drawer>
+
+<DeleteProfileDialog open={isDialogOpen} profile={deletingProfile} />
 
 <style>
 	main {
@@ -92,7 +105,18 @@
 		padding-inline-start: 0;
 	}
 
+	.profile-item {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--spacing-2);
+	}
+
 	.nickname {
 		text-transform: uppercase;
+	}
+
+	.create-button {
+		margin-block-start: var(--spacing-5);
 	}
 </style>

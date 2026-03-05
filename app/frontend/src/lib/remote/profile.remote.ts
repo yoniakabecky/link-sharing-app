@@ -2,7 +2,7 @@ import * as v from 'valibot';
 import { error, invalid } from '@sveltejs/kit';
 import { form, query } from '$app/server';
 import { createProfileSchema, updateProfileSchema, type Profile } from '$lib/models/profile';
-import { apiGet, apiPost, apiPut } from '$lib/fetcher';
+import { apiDelete, apiGet, apiPost, apiPut } from '$lib/fetcher';
 import { requireAuth } from '$lib/require-auth';
 import { globalState } from '$lib/state.svelte';
 
@@ -54,9 +54,25 @@ export const createProfile = form(createProfileSchema, async (data) => {
 			invalid(`Error creating profile: ${response.statusText}`);
 		}
 		const newProfile = await response.json();
+
 		return { success: true, profile: newProfile };
 	} catch (err) {
 		console.error(err);
 		error(500, `Error creating profile: ${err instanceof Error ? err.message : 'Unknown error'}`);
+	}
+});
+
+export const deleteProfile = form('unchecked', async ({ profileID }) => {
+	try {
+		const { token } = requireAuth();
+		const response = await apiDelete(`/profiles/${profileID}`, token);
+		if (!response.ok) {
+			invalid(`Error deleting profile: ${response.statusText}`);
+		}
+
+		return { success: true };
+	} catch (err) {
+		console.error(err);
+		error(500, `Error deleting profile: ${err instanceof Error ? err.message : 'Unknown error'}`);
 	}
 });
