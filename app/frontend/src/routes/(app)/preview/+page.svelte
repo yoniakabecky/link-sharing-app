@@ -2,9 +2,10 @@
 	import Card from '$lib/components/Card.svelte';
 	import PublicProfile from '$lib/components/PublicProfile.svelte';
 	import { getProfile } from '$lib/remote/profile.remote';
-	import { globalState } from '$lib/state.svelte';
+	import { getProfileID } from '$lib/state.svelte';
 
-	const profile = await getProfile(globalState.profileID);
+	const profileID = getProfileID();
+	const profile = await getProfile(profileID);
 </script>
 
 <div class="background-accent"></div>

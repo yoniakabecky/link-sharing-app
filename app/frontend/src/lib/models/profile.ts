@@ -15,6 +15,7 @@ export type Profile = {
 };
 
 export const updateProfileSchema = v.object({
+	id: v.string(),
 	first_name: v.pipe(v.string(), v.nonEmpty('Please enter your first name.')),
 	last_name: v.pipe(v.string(), v.nonEmpty('Please enter your last name.')),
 	email: v.optional(v.pipe(v.string(), v.email('Please enter a valid email address.'))),

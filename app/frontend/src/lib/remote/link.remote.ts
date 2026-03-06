@@ -4,9 +4,10 @@ import { form, query } from '$app/server';
 import { updateLinksSchema, type Link } from '$lib/models/link';
 import { apiGet, apiPut } from '$lib/fetcher';
 import { requireAuth } from '$lib/require-auth';
-import { globalState } from '$lib/state.svelte';
 
 export const getLinks = query(v.string(), async (profileID) => {
+	if (!profileID) return [];
+
 	const { token } = requireAuth();
 	const response = await apiGet(`/links/${profileID}`, token);
 	if (!response.ok) {
@@ -17,7 +18,7 @@ export const getLinks = query(v.string(), async (profileID) => {
 	return data as Link[];
 });
 
-export const updateLinks = form(updateLinksSchema, async ({ links }) => {
+export const updateLinks = form(updateLinksSchema, async ({ profileID, links }) => {
 	try {
 		const { token } = requireAuth();
 		const body = links.map((link) => ({
@@ -26,7 +27,7 @@ export const updateLinks = form(updateLinksSchema, async ({ links }) => {
 			url: link.url
 		}));
 
-		const response = await apiPut(`/links/${globalState.profileID}`, token, {
+		const response = await apiPut(`/links/${profileID}`, token, {
 			body: JSON.stringify(body)
 		});
 		if (!response.ok) {

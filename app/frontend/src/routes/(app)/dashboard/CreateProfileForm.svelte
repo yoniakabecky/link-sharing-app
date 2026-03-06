@@ -3,7 +3,7 @@
 	import Button from '$lib/components/Button.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { createProfile } from '$lib/remote/profile.remote';
-	import { globalState } from '$lib/state.svelte';
+	import { setProfileID } from '$lib/state.svelte';
 	import { toast } from 'svelte-sonner';
 </script>
 
@@ -15,7 +15,7 @@
 			const result = createProfile.result;
 			if (result?.success) {
 				form.reset();
-				globalState.profileID = String(result.profile.id);
+				setProfileID(String(result.profile.id));
 				toast.success('Profile created successfully!');
 				goto('/profile');
 			} else {

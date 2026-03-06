@@ -114,6 +114,8 @@
 		+ Add new link
 	</Button>
 
+	<input {...updateLinks.fields.profileID.as('text')} type="hidden" />
+
 	<ul
 		class="links-list"
 		role="list"

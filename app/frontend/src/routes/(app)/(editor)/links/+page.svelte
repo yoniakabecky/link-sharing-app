@@ -7,13 +7,15 @@
 	import type { Link } from '$lib/models/link';
 	import { getLinks, updateLinks } from '$lib/remote/link.remote';
 	import { getPlatforms } from '$lib/remote/platform.remote';
-	import { globalState } from '$lib/state.svelte';
+	import { getProfileID } from '$lib/state.svelte';
 	import LinksForm from './LinksForm.svelte';
 
-	const links = await getLinks(globalState.profileID);
+	const profileID = getProfileID();
+	const links = await getLinks(profileID);
 	const platforms = await getPlatforms();
 
 	onMount(() => {
+		updateLinks.fields.profileID.set(profileID);
 		if (links.length === 0) {
 			updateLinks.fields.links.set([{ ...defaultLink, position: 0 }]);
 		} else {

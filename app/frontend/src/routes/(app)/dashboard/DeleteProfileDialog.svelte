@@ -2,8 +2,8 @@
 	import Button from '$lib/components/Button.svelte';
 	import Dialog from '$lib/components/Dialog.svelte';
 	import type { Profile } from '$lib/models/profile';
-	import { deleteProfile, getProfiles } from '$lib/remote/profile.remote';
-	import { globalState } from '$lib/state.svelte';
+	import { deleteProfile } from '$lib/remote/profile.remote';
+	import { getProfileID, setProfileID } from '$lib/state.svelte';
 	import { toast } from 'svelte-sonner';
 
 	let dialog: Dialog;
@@ -14,6 +14,7 @@
 	};
 	let { open, profile }: Props = $props();
 
+	const profileID = getProfileID();
 	let errorMessage = $state('');
 
 	$effect(() => {
@@ -30,8 +31,8 @@
 				await submit();
 				const result = deleteProfile.result;
 				if (result?.success) {
-					if (globalState.profileID === profile?.id.toString()) {
-						globalState.profileID = '';
+					if (profileID === profile?.id.toString()) {
+						setProfileID('');
 					}
 					dialog?.close();
 					toast.success('Profile deleted successfully!');

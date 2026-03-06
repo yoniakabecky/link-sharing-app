@@ -5,23 +5,27 @@
 	import Mockup from '$lib/components/Mockup.svelte';
 	import type { UpdateProfile } from '$lib/models/profile';
 	import { getProfile, updateProfile } from '$lib/remote/profile.remote';
-	import { globalState } from '$lib/state.svelte';
+	import { getProfileID } from '$lib/state.svelte';
 	import ProfileForm from './ProfileForm.svelte';
 
-	const profile = await getProfile(globalState.profileID);
+	const profileID = getProfileID();
+	const profile = $derived(await getProfile(profileID));
 
 	onMount(() => {
-		updateProfile.fields.set(profile);
+		if (profile) {
+			updateProfile.fields.set({ ...profile, id: String(profile.id) });
+		}
 	});
 
 	const displayProfile = $derived.by(() => {
 		const formValues = updateProfile.fields;
 		return {
+			id: formValues.id.value(),
 			first_name: formValues.first_name.value(),
 			last_name: formValues.last_name.value(),
 			email: formValues.email.value(),
 			avatar_url: formValues.avatar_url.value(),
-			links: profile.links
+			links: profile?.links ?? []
 		} as UpdateProfile;
 	});
 </script>

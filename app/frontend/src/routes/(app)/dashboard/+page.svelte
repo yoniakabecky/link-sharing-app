@@ -6,7 +6,7 @@
 	import type { Profile } from '$lib/models/profile';
 	import { logout } from '$lib/remote/auth.remote';
 	import { getProfiles } from '$lib/remote/profile.remote';
-	import { globalState } from '$lib/state.svelte';
+	import { getProfileID, setProfileID } from '$lib/state.svelte';
 	import CreateProfileForm from './CreateProfileForm.svelte';
 	import DeleteProfileDialog from './DeleteProfileDialog.svelte';
 
@@ -17,12 +17,14 @@
 			: 'No profiles found. Create a new profile to get started.'
 	);
 
+	const profileID = getProfileID();
+
 	let open = $state(false);
 	let deletingProfile = $state<Profile | null>(null);
 	let isDialogOpen = $state(false);
 
-	const onSelectProfile = async (profileID: string) => {
-		globalState.profileID = profileID;
+	const onSelectProfile = async (id: string) => {
+		setProfileID(id);
 		await goto('/profile');
 	};
 
@@ -41,7 +43,7 @@
 		{#each profiles as profile}
 			<li class="profile-item">
 				<Button
-					variant={profile.id.toString() === globalState.profileID ? 'primary' : 'outlined'}
+					variant={profile.id.toString() === profileID ? 'primary' : 'outlined'}
 					class="full-width"
 					onclick={() => onSelectProfile(profile.id.toString())}
 				>

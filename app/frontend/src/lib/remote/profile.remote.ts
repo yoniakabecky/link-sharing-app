@@ -4,7 +4,6 @@ import { form, query } from '$app/server';
 import { createProfileSchema, updateProfileSchema, type Profile } from '$lib/models/profile';
 import { apiDelete, apiGet, apiPost, apiPut } from '$lib/fetcher';
 import { requireAuth } from '$lib/require-auth';
-import { globalState } from '$lib/state.svelte';
 
 export const getProfiles = query(async () => {
 	const { token } = requireAuth();
@@ -31,8 +30,9 @@ export const getProfile = query(v.string(), async (profileID) => {
 export const updateProfile = form(updateProfileSchema, async (profile) => {
 	try {
 		const { token } = requireAuth();
-		const response = await apiPut(`/profiles/${globalState.profileID}`, token, {
-			body: JSON.stringify(profile)
+		const { id, ...profileData } = profile;
+		const response = await apiPut(`/profiles/${id}`, token, {
+			body: JSON.stringify(profileData)
 		});
 		if (!response.ok) {
 			invalid(`Error updating profile: ${response.statusText}`);

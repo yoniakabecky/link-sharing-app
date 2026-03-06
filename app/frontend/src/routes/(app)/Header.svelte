@@ -3,13 +3,13 @@
 	import Button from '$lib/components/Button.svelte';
 	import Icon from '$lib/components/Icon.svelte';
 	import LogoLink from '$lib/components/LogoLink.svelte';
-	import { globalState } from '$lib/state.svelte';
+	import { getProfileID } from '$lib/state.svelte';
 	import { toast } from 'svelte-sonner';
 
 	let isPreview = $derived(page.url.pathname === '/preview');
 	let pathname = $derived(page.url.pathname);
 
-	const profileID = $derived(globalState.profileID);
+	const profileID = getProfileID();
 	const copyUrl = () => {
 		const url = `${window.location.origin}/shared?id=${profileID}`;
 		navigator.clipboard.writeText(url);

@@ -1,7 +1,17 @@
 <script lang="ts">
+	import { getProfileID, setProfileID } from '$lib/state.svelte';
+	import { onMount } from 'svelte';
 	import Header from './Header.svelte';
 
 	let { children } = $props();
+
+	onMount(() => {
+		const profileID = getProfileID();
+		const sessionProfileID = sessionStorage.getItem('profileID');
+		if (profileID !== sessionProfileID && !profileID && sessionProfileID) {
+			setProfileID(sessionProfileID);
+		}
+	});
 </script>
 
 <div class="app">

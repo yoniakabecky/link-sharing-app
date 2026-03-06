@@ -61,12 +61,14 @@
 			<small>Use PNG, JPG, or BMP format.</small>
 		</div>
 	</div>
+
+	<input type="hidden" {...updateProfile.fields.id.as('text')} />
+
 	<div class="profile-details">
 		<div class="profile-details-item">
 			<label for="first-name">First name*</label>
 			<TextInput id="first-name" {...updateProfile.fields.first_name.as('text')} />
 			{#each updateProfile.fields.first_name.issues() as issue}
-				<span></span>
 				<small class="issue">{issue.message}</small>
 			{/each}
 		</div>

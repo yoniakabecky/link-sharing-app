@@ -24,6 +24,7 @@ const updateLinkSchema = v.object({
 });
 
 export const updateLinksSchema = v.object({
+	profileID: v.pipe(v.string(), v.nonEmpty('Please select a profile.')),
 	links: v.array(updateLinkSchema)
 });
 
