@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import Button from '$lib/components/Button.svelte';
 	import Drawer from '$lib/components/Drawer.svelte';
@@ -25,7 +26,7 @@
 
 	const onSelectProfile = async (id: string) => {
 		setProfileID(id);
-		await goto('/profile');
+		await goto(resolve('/profile'));
 	};
 
 	const onDeleteProfile = (profile: Profile) => {
@@ -40,7 +41,7 @@
 	<p class="description">{message}</p>
 
 	<ul class="profiles">
-		{#each profiles as profile}
+		{#each profiles as profile (profile.id)}
 			<li class="profile-item">
 				<Button
 					variant={profile.id.toString() === profileID ? 'primary' : 'outlined'}

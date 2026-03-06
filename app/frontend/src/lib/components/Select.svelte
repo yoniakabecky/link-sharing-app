@@ -5,12 +5,12 @@
 		label?: string;
 		placeholder?: string;
 		errorMessage?: string;
-		leftIcon?: IconName;
+		leftIcon?: IconName; // TODO: implement this
 		options: { label: string; value: string; icon?: IconName }[];
 	} & svelteHTML.IntrinsicElements['select'];
 
 	let uid = $props.id();
-	let { label, placeholder, errorMessage, options, leftIcon, ...props }: Props = $props();
+	let { label, placeholder, errorMessage, options, ...props }: Props = $props();
 </script>
 
 {#if label}
@@ -20,7 +20,7 @@
 <div class="select-container">
 	<select id={uid} {...props}>
 		<option value="">{placeholder ?? 'Please select an option'}</option>
-		{#each options as option}
+		{#each options as option (option.value)}
 			<option value={option.value}>
 				{#if option.icon}
 					<span class="icon" aria-hidden="true">

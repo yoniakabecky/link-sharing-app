@@ -41,7 +41,7 @@
 			{@render profileDisplay(profile)}
 
 			<div class="links">
-				{#each profile.links as link}
+				{#each profile.links as link (link.id)}
 					<div class="link">
 						<PlatformButton {link} size="sm" />
 					</div>
@@ -52,14 +52,14 @@
 
 			<div class="links">
 				{#if links && links.length > 0}
-					{#each links as link}
+					{#each links as link (link.id)}
 						<div class="link">
 							<PlatformButton link={link as Link} size="sm" />
 						</div>
 					{/each}
 				{/if}
 				{#if numOfSkeletonLinks > 0}
-					{#each Array(numOfSkeletonLinks) as _}
+					{#each Array(numOfSkeletonLinks) as index (index)}
 						<div class="link skeleton"></div>
 					{/each}
 				{/if}

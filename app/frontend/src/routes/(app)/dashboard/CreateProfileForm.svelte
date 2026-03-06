@@ -1,5 +1,6 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import Button from '$lib/components/Button.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
 	import { createProfile } from '$lib/remote/profile.remote';
@@ -17,7 +18,7 @@
 				form.reset();
 				setProfileID(String(result.profile.id));
 				toast.success('Profile created successfully!');
-				goto('/profile');
+				await goto(resolve('/profile'));
 			} else {
 				toast.error('Failed to create profile.');
 			}
@@ -34,7 +35,7 @@
 			required
 			{...createProfile.fields.nickname.as('text')}
 		/>
-		{#each createProfile.fields.nickname.issues() as issue}
+		{#each createProfile.fields.nickname.issues() as issue (issue.message)}
 			<small class="issue">{issue.message}</small>
 		{/each}
 	</div>
@@ -45,7 +46,7 @@
 			required
 			{...createProfile.fields.first_name.as('text')}
 		/>
-		{#each createProfile.fields.first_name.issues() as issue}
+		{#each createProfile.fields.first_name.issues() as issue (issue.message)}
 			<small class="issue">{issue.message}</small>
 		{/each}
 	</div>
@@ -56,7 +57,7 @@
 			required
 			{...createProfile.fields.last_name.as('text')}
 		/>
-		{#each createProfile.fields.last_name.issues() as issue}
+		{#each createProfile.fields.last_name.issues() as issue (issue.message)}
 			<small class="issue">{issue.message}</small>
 		{/each}
 	</div>

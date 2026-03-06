@@ -14,7 +14,7 @@
 	</div>
 
 	<div class="links">
-		{#each profile.links as link}
+		{#each profile.links as link (link.id)}
 			<div class="link">
 				<PlatformButton {link} />
 			</div>

@@ -32,7 +32,9 @@
 	};
 
 	const onRemoveLink = (index: number) => {
-		const newLinks = updateLinks.fields.links.value().filter((_: any, i: number) => index !== i);
+		const newLinks = updateLinks.fields.links
+			.value()
+			.filter((_: unknown, i: number) => index !== i);
 		updateLinks.fields.links.set(newLinks);
 	};
 
@@ -123,7 +125,8 @@
 		ondragover={(e) => e.preventDefault()}
 		ondragleave={(e) => onDragLeave(e)}
 	>
-		{#each updateLinks.fields.links.value() as _, index}
+		<!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
+		{#each updateLinks.fields.links.value() as _, index (index)}
 			{#if showPlaceholderBefore(index)}
 				{@render dropTargetPlaceholder(index, false)}
 			{/if}
@@ -157,7 +160,7 @@
 							options={platformOptions}
 							{...updateLinks.fields.links[index].platform_id.as('select')}
 						/>
-						{#each updateLinks.fields.links[index].platform_id.issues() as issue}
+						{#each updateLinks.fields.links[index].platform_id.issues() as issue (issue.message)}
 							<small class="issue">{issue.message}</small>
 						{/each}
 					</div>
@@ -168,7 +171,7 @@
 							leftIcon="link"
 							{...updateLinks.fields.links[index].url.as('text')}
 						/>
-						{#each updateLinks.fields.links[index].url.issues() as issue}
+						{#each updateLinks.fields.links[index].url.issues() as issue (issue.message)}
 							<small class="issue">{issue.message}</small>
 						{/each}
 					</div>

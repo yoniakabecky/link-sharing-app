@@ -18,7 +18,7 @@
 <form novalidate {...props}>
 	<div>
 		<TextInput label="Email" placeholder="Email" {...fields?.email?.as('email')} />
-		{#each fields?.email?.issues() as issue}
+		{#each fields?.email?.issues() as issue (issue.message)}
 			<small class="issue">{issue.message}</small>
 		{/each}
 	</div>
@@ -29,7 +29,7 @@
 			{...fields?.password?.as('password')}
 			type={showPassword ? 'text' : 'password'}
 		/>
-		{#each fields?.password?.issues() as issue}
+		{#each fields?.password?.issues() as issue (issue.message)}
 			<small class="issue">{issue.message}</small>
 		{/each}
 		<div class="show-password">
