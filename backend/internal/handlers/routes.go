@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"net/http"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/yoniakabecky/link-sharing-app/backend/internal/config"
 	"github.com/yoniakabecky/link-sharing-app/backend/internal/pkg/jwt"
 )
 
@@ -13,9 +16,13 @@ type Handlers struct {
 	User     *UserHandler
 }
 
-func RegisterRoutes(h *Handlers) *chi.Mux {
+func RegisterRoutes(h *Handlers, cfg *config.Config) *chi.Mux {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
+
+	if cfg != nil && cfg.Upload.Dir != "" {
+		r.Mount("/uploads", http.FileServer(http.Dir(cfg.Upload.Dir)))
+	}
 
 	// Public routes: no token required
 	r.Route("/auth", func(r chi.Router) {
@@ -39,6 +46,7 @@ func RegisterRoutes(h *Handlers) *chi.Mux {
 			r.Get("/{id}", h.Profile.GetProfileByID)
 			r.Post("/", h.Profile.CreateProfile)
 			r.Put("/{id}", h.Profile.UpdateProfile)
+			r.Post("/{id}/avatar", h.Profile.UploadAvatar)
 			r.Delete("/{id}", h.Profile.DeleteProfile)
 		})
 		r.Route("/links", func(r chi.Router) {

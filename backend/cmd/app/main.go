@@ -22,7 +22,7 @@ func main() {
 	}()
 	log.Println("Connected to database")
 
-	r := handlers.RegisterRoutes(deps.Handlers)
+	r := handlers.RegisterRoutes(deps.Handlers, cfg)
 
 	app := New(r, cfg.Server.Address)
 	ctx := context.Background()

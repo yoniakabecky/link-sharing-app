@@ -31,7 +31,7 @@ func InitializeDependencies(cfg *config.Config) (*Dependencies, error) {
 	userSrv := services.NewUserServices(userRepo, rtRepo)
 
 	pltHdl := handlers.NewPlatformHandler(pltSrv)
-	prfHdl := handlers.NewProfileHandler(prfSrv)
+	prfHdl := handlers.NewProfileHandler(prfSrv, &cfg.Upload)
 	linkHdl := handlers.NewLinkHandler(linkSrv)
 	userHdl := handlers.NewUserHandler(userSrv)
 

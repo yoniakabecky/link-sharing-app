@@ -10,6 +10,14 @@ type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
 	JWT      JWTConfig
+	Upload   UploadConfig
+}
+
+// UploadConfig holds avatar upload configuration
+type UploadConfig struct {
+	Dir      string // directory for uploads (e.g. "uploads"); avatars saved under Dir/avatars/
+	MaxBytes int64  // max file size in bytes (e.g. 2 * 1024 * 1024 = 2MB)
+	BaseURL  string // base URL for building avatar_url in responses (e.g. "http://localhost:8080")
 }
 
 // ServerConfig holds server-related configuration
@@ -56,6 +64,11 @@ func Load() *Config {
 			Key:        getEnv("JWT_KEY", "secret"),
 			Exp:        getEnvAsInt("JWT_EXP", 60*15),              // 15 min default
 			RefreshExp: getEnvAsInt("JWT_REFRESH_EXP", 60*60*24*7), // 7 days default
+		},
+		Upload: UploadConfig{
+			Dir:      getEnv("UPLOAD_DIR", "uploads"),
+			MaxBytes: getEnvAsInt("UPLOAD_MAX_BYTES", 2*1024*1024), // 2MB default
+			BaseURL:  getEnv("API_BASE_URL", "http://localhost:8080"),
 		},
 	}
 }
