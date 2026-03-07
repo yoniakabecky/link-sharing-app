@@ -27,12 +27,33 @@ export const getProfile = query(v.string(), async (profileID) => {
 	return data as Profile;
 });
 
+const uploadAvatar = async (profileID: string, avatar: File, token: string) => {
+	const formData = new FormData();
+	formData.append('avatar', avatar);
+	const response = await apiPost(`/profiles/${profileID}/avatar`, token, { body: formData });
+	if (!response.ok) {
+		console.error(response.statusText);
+		invalid(`Failed to upload avatar: ${response.statusText}`);
+	}
+	const { avatar_url } = await response.json();
+	return avatar_url as string;
+};
+
 export const updateProfile = form(updateProfileSchema, async (profile) => {
 	try {
 		const { token } = requireAuth();
-		const { id, ...profileData } = profile;
+		const { id, avatar, ...profileData } = profile;
+		let avatar_url = profileData.avatar_url;
+
+		if (avatar && typeof avatar === 'object' && 'size' in avatar && avatar.size > 0) {
+			avatar_url = await uploadAvatar(id, avatar as File, token);
+		}
+
 		const response = await apiPut(`/profiles/${id}`, token, {
-			body: JSON.stringify(profileData)
+			body: JSON.stringify({
+				...profileData,
+				avatar_url
+			})
 		});
 		if (!response.ok) {
 			invalid(`Error updating profile: ${response.statusText}`);

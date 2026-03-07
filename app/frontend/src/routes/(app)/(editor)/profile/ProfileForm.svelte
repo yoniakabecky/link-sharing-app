@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import Icon from '$lib/components/Icon.svelte';
 	import TextInput from '$lib/components/TextInput.svelte';
@@ -11,8 +12,37 @@
 
 	let { updateProfile }: Props = $props();
 
-	let haveImage = $derived(!!updateProfile.fields.avatar_url.value());
-	let fileInputMessage = $derived(haveImage ? 'Change Image' : '+ Upload Image');
+	let selectedFile = $state<File | null>(null);
+	let blobUrl = $state<string | null>(null);
+
+	const thumbnailUrl = $derived(blobUrl ?? updateProfile.fields.avatar_url.value() ?? '');
+	const haveImage = $derived(!!thumbnailUrl);
+	const fileInputMessage = $derived(haveImage ? 'Change Image' : '+ Upload Image');
+
+	$effect(() => {
+		const file = selectedFile;
+		if (file) {
+			const url = URL.createObjectURL(file);
+			blobUrl = url;
+			return () => {
+				URL.revokeObjectURL(url);
+				blobUrl = null;
+			};
+		} else {
+			blobUrl = null;
+		}
+	});
+
+	onDestroy(() => {
+		if (blobUrl) {
+			URL.revokeObjectURL(blobUrl);
+		}
+	});
+
+	const handleFileChange = (e: Event) => {
+		const input = e.target as HTMLInputElement;
+		selectedFile = input.files?.[0] ?? null;
+	};
 </script>
 
 <form
@@ -23,6 +53,7 @@
 		try {
 			await submit();
 			if (updateProfile.result?.success) {
+				selectedFile = null;
 				toast.success('Profile updated successfully!');
 			} else {
 				toast.warning('Please check the fields and try again...');
@@ -37,24 +68,23 @@
 		<label for="profile-picture-input">Profile Picture</label>
 
 		<div class="profile-picture-wrapper">
-			{#if updateProfile.fields.avatar_url.value()}
-				<img
-					class="profile-picture-img"
-					src={updateProfile.fields.avatar_url.value()}
-					alt="Your profile"
-				/>
-				<input type="hidden" {...updateProfile.fields.avatar_url.as('text')} />
+			{#if thumbnailUrl}
+				<img class="profile-picture-img" src={thumbnailUrl} alt="Your profile" />
 			{/if}
-			<!-- TODO: handle file select / upload -->
 			<input
 				id="profile-picture-input"
-				accept="image/*"
+				accept="image/png,image/jpeg,image/bmp"
 				{...updateProfile.fields.avatar.as('file')}
+				onchange={handleFileChange}
 			/>
-			<div class="profile-picture-overlay" data-have-image={haveImage}>
+			<label
+				for="profile-picture-input"
+				class="profile-picture-overlay"
+				data-have-image={haveImage}
+			>
 				<Icon name="pic_line" size={32} />
 				<div>{fileInputMessage}</div>
-			</div>
+			</label>
 		</div>
 		<div>
 			<small>Image must be below 1024x1024px.</small>
@@ -62,6 +92,7 @@
 		</div>
 	</div>
 
+	<input type="hidden" {...updateProfile.fields.avatar_url.as('text')} />
 	<input type="hidden" {...updateProfile.fields.id.as('text')} />
 
 	<div class="profile-details">

@@ -59,7 +59,8 @@
 					{/each}
 				{/if}
 				{#if numOfSkeletonLinks > 0}
-					{#each Array(numOfSkeletonLinks) as index (index)}
+					<!-- eslint-disable-next-line @typescript-eslint/no-unused-vars -->
+					{#each Array(numOfSkeletonLinks) as _, index (index)}
 						<div class="link skeleton"></div>
 					{/each}
 				{/if}

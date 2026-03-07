@@ -7,14 +7,16 @@ const fetcher = async (
 	init?: RequestInit
 ) => {
 	const fullUrl = `${API_BASE_URL}${route}`;
-	const options = {
+	const isFormData = init?.body instanceof FormData;
+	const headers: HeadersInit = {
+		Accept: 'application/json',
+		Authorization: `Bearer ${token}`,
+		...(isFormData ? {} : { 'Content-Type': 'application/json' })
+	};
+	const options: RequestInit = {
 		method,
 		...init,
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			Authorization: `Bearer ${token}`
-		}
+		headers
 	};
 
 	const logResponse = async (response: Response) => {
@@ -33,7 +35,7 @@ const fetcher = async (
 			method,
 			url: fullUrl,
 			status: response.status,
-			body: init?.body ? init.body : 'none',
+			body: isFormData ? 'FormData' : (init?.body ?? 'none'),
 			response: content
 		};
 		console.log(JSON.stringify(message));
