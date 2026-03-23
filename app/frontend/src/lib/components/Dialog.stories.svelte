@@ -7,14 +7,14 @@
 		title: 'Components/Dialog',
 		component: Dialog
 	});
-	let dialog: ReturnType<typeof Dialog> | null = $state(null);
+	let dialogOpen = $state(false);
 </script>
 
-<Button onclick={() => dialog?.showModal()}>Open Dialog</Button>
+<Button onclick={() => (dialogOpen = true)}>Open Dialog</Button>
 
 <Story name="Default" asChild>
-	<Dialog bind:this={dialog}>
+	<Dialog open={dialogOpen} onclose={() => (dialogOpen = false)}>
 		<p>This is a dialog content.</p>
-		<Button onclick={() => dialog?.close()}>Close</Button>
+		<Button onclick={() => (dialogOpen = false)}>Close</Button>
 	</Dialog>
 </Story>

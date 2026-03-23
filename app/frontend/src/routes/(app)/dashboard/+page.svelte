@@ -78,7 +78,14 @@
 	<CreateProfileForm />
 </Drawer>
 
-<DeleteProfileDialog open={isDialogOpen} profile={deletingProfile} />
+<DeleteProfileDialog
+		open={isDialogOpen}
+		profile={deletingProfile}
+		onclose={() => {
+			isDialogOpen = false;
+			deletingProfile = null;
+		}}
+	/>
 
 <style>
 	main {

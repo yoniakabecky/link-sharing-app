@@ -6,25 +6,18 @@
 	import { getProfileID, setProfileID } from '$lib/state.svelte';
 	import { toast } from 'svelte-sonner';
 
-	let dialog: Dialog;
-
 	type Props = {
 		open: boolean;
 		profile: Profile | null;
+		onclose: () => void;
 	};
-	let { open, profile }: Props = $props();
+	let { open, profile, onclose }: Props = $props();
 
 	const profileID = getProfileID();
 	let errorMessage = $state('');
-
-	$effect(() => {
-		if (profile && open) {
-			dialog?.showModal();
-		}
-	});
 </script>
 
-<Dialog bind:this={dialog}>
+<Dialog {open} onclose={() => onclose?.()}>
 	<form
 		{...deleteProfile.enhance(async ({ submit }) => {
 			try {
@@ -34,7 +27,7 @@
 					if (profileID === profile?.id.toString()) {
 						setProfileID('');
 					}
-					dialog?.close();
+					close();
 					toast.success('Profile deleted successfully!');
 				} else {
 					errorMessage = 'Failed to delete profile.';
@@ -57,7 +50,7 @@
 		{/if}
 
 		<div class="buttons">
-			<Button variant="subtle" onclick={() => dialog?.close()}>Cancel</Button>
+			<Button variant="subtle" onclick={close}>Cancel</Button>
 			<Button variant="danger" type="submit">Delete</Button>
 		</div>
 	</form>
