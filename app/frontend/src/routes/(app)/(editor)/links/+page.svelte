@@ -19,14 +19,14 @@
 		if (links.length === 0) {
 			updateLinks.fields.links.set([{ ...defaultLink, position: 0 }]);
 		} else {
-			for (let i = 0; i < links.length; i++) {
-				updateLinks.fields.links[i].set({
-					id: String(links[i].id),
-					platform_id: String(links[i].platform_id),
-					url: links[i].url,
-					position: links[i].position
-				});
-			}
+			updateLinks.fields.links.set(
+				links.map((link) => ({
+					id: String(link.id),
+					platform_id: String(link.platform_id),
+					url: link.url,
+					position: link.position
+				}))
+			);
 		}
 	});
 
