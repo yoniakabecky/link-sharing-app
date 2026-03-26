@@ -9,11 +9,11 @@
 	import ProfileForm from './ProfileForm.svelte';
 
 	const profileID = getProfileID();
-	const profile = await getProfile(profileID);
+	const data = await getProfile(profileID);
 
 	onMount(() => {
-		if (profile) {
-			updateProfile.fields.set({ ...profile, id: String(profile.id) });
+		if (data.success && data.profile) {
+			updateProfile.fields.set({ ...data.profile, id: String(data.profile.id) });
 		}
 	});
 
@@ -25,7 +25,7 @@
 			last_name: formValues.last_name.value(),
 			email: formValues.email.value(),
 			avatar_url: formValues.avatar_url.value(),
-			links: profile?.links ?? []
+			links: data?.profile?.links ?? []
 		} as unknown as Partial<Profile>;
 	});
 </script>

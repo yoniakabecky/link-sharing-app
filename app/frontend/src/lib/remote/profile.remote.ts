@@ -20,11 +20,19 @@ export const getProfile = query(v.string(), async (profileID) => {
 	const { token } = requireAuth();
 	const response = await apiGet(`/profiles/${profileID}`, token);
 	if (!response.ok) {
-		error(response.status, `Error fetching profile: ${response.statusText}`);
+		return {
+			success: false,
+			status: response.status,
+			message: `Error fetching profile: ${response.statusText}`
+		};
 	}
 	const data = await response.json();
 
-	return data as Profile;
+	return {
+		success: true,
+		status: response.status,
+		profile: data as Profile
+	};
 });
 
 const uploadAvatar = async (profileID: string, avatar: File, token: string) => {

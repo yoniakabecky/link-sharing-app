@@ -5,7 +5,7 @@
 	import { getProfileID } from '$lib/state.svelte';
 
 	const profileID = getProfileID();
-	const profile = await getProfile(profileID);
+	const { profile } = await getProfile(profileID);
 </script>
 
 <div class="background-accent"></div>
