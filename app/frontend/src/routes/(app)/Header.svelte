@@ -9,7 +9,7 @@
 	let isPreview = $derived(page.url.pathname === '/preview');
 	let pathname = $derived(page.url.pathname);
 
-	const profileID = getProfileID();
+	let profileID = $derived(getProfileID());
 	const copyUrl = () => {
 		const url = `${window.location.origin}/shared?id=${profileID}`;
 		navigator.clipboard.writeText(url);

@@ -13,8 +13,9 @@ export const setProfileID = (id: string) => {
 };
 
 export const getProfileID = () => {
+	const stateID = profileID; // always read $state first so $derived can track it
 	if (browser) {
-		return sessionStorage.getItem('profileID') || profileID;
+		return sessionStorage.getItem('profileID') || stateID;
 	}
-	return profileID;
+	return stateID;
 };
